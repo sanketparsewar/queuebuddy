@@ -281,7 +281,7 @@ const RestaurantDashboard = ({ restaurantId }: { restaurantId: string }) => {
     });
   };
 
-  const joinUrl = `${window.location.origin}/join?restaurantId=${restaurantId}`;
+  const joinUrl = `${import.meta.env.VITE_QR_CODE_URL}/join?restaurantId=${restaurantId}`;
 
   if (!restaurant) {
     return (
