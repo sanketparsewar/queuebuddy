@@ -77,6 +77,11 @@ const CustomerJoin = () => {
     if (!restaurantId) return;
     setLoading(true);
     setError("");
+    if (phone.length !== 10) {
+      setError("Please enter a valid 10-digit phone number.");
+      setLoading(false);
+      return;
+    }
     try {
       await runTransaction(db, async (transaction) => {
         const restaurantRef = doc(db, "restaurants", restaurantId);
@@ -131,6 +136,7 @@ const CustomerJoin = () => {
     if (restaurantId) {
       localStorage.removeItem(`queue_entry_${restaurantId}`);
       setToken(null);
+      window.close();
     }
   };
 
@@ -156,7 +162,7 @@ const CustomerJoin = () => {
 
     return (
       <div
-        className={`min-h-screen transition-colors duration-500 flex items-center justify-center p-2 ${
+        className={`min-h-screen transition-colors duration-500 flex items-center justify-center p-4 ${
           isCalled
             ? "bg-amber-500"
             : isCompleted
@@ -170,7 +176,7 @@ const CustomerJoin = () => {
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 1.2, opacity: 0 }}
-            className={`bg-white w-full max-w-md rounded-[2.5rem] p-10 shadow-2xl text-center relative overflow-hidden border-8 ${
+            className={`bg-white w-full max-w-md rounded-[2.5rem] p-6 sm:p-8 shadow-2xl text-center relative overflow-hidden border-8 ${
               isCalled
                 ? "border-amber-400"
                 : isCompleted
@@ -220,7 +226,7 @@ const CustomerJoin = () => {
             </p>
 
             <div
-              className={`rounded-[2rem] p-10 mb-10 transition-all transform ${
+              className={`rounded-[2rem] p-6 sm:p-8 mb-6 transition-all transform ${
                 isCalled
                   ? "bg-amber-600 text-white scale-110 shadow-xl shadow-amber-200"
                   : isCompleted
@@ -229,14 +235,14 @@ const CustomerJoin = () => {
               }`}
             >
               <p
-                className={`text-xs uppercase tracking-[0.2em] font-black mb-4 ${
+                className={`text-xs uppercase tracking-[0.2em] font-black mb-2 ${
                   isCalled ? "text-amber-100" : "text-gray-400"
                 }`}
               >
                 Token Number
               </p>
               <h1
-                className={`text-8xl font-black leading-none ${
+                className={`text-7xl font-black leading-none ${
                   isCalled
                     ? "text-white"
                     : isCompleted
@@ -249,7 +255,7 @@ const CustomerJoin = () => {
             </div>
 
             <div
-              className={`p-6 rounded-2xl mb-8 flex flex-col items-center justify-center gap-3 ${
+              className={`p-4 rounded-2xl mb-6 flex flex-col items-center justify-center gap-2 ${
                 isCalled
                   ? "bg-white border-2 border-amber-500 text-amber-600"
                   : isCompleted
@@ -304,13 +310,13 @@ const CustomerJoin = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white w-full max-w-md rounded-2xl p-8 shadow-sm border border-gray-100"
+        className="bg-white w-full max-w-md rounded-2xl p-6 sm:p-8 shadow-sm border border-gray-100"
       >
-        <div className="text-center mb-8">
+        <div className="text-center mb-6">
           <div className="bg-indigo-50 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4">
             <UserPlus className="w-8 h-8 text-indigo-600" />
           </div>
@@ -346,9 +352,13 @@ const CustomerJoin = () => {
               type="tel"
               required
               value={phone}
-              onChange={(e) => setPhone(e.target.value)}
+              onChange={(e) =>
+                setPhone(e.target.value.replace(/\D/g, "").slice(0, 10))
+              }
               className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
-              placeholder="Enter your phone number"
+              placeholder="Enter 10-digit number"
+              pattern="\d{10}"
+              title="Please enter exactly 10 digits"
             />
           </div>
           <button
