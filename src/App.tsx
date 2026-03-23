@@ -46,6 +46,9 @@ import {
   ArrowRight,
   UserPlus,
   Download,
+  Calendar,
+  FileDown,
+  Search,
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 
@@ -123,6 +126,40 @@ interface QueueEntry {
 }
 
 // --- Components ---
+
+const LiveClock = () => {
+  const [time, setTime] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => setTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  return (
+    <div className="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm flex items-center gap-4 min-w-[240px]">
+      <div className="bg-indigo-50 p-3 rounded-xl">
+        <Clock className="w-6 h-6 text-indigo-600" />
+      </div>
+      <div className="text-right flex-1">
+        <div className="text-2xl font-bold text-gray-900 tabular-nums">
+          {time.toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+          })}
+        </div>
+        <div className="text-xs text-gray-500 font-medium">
+          {time.toLocaleDateString([], {
+            weekday: "short",
+            month: "short",
+            day: "numeric",
+            year: "numeric",
+          })}
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const Navbar = ({
   user,
@@ -250,6 +287,7 @@ const RestaurantDashboard = ({ restaurantId }: { restaurantId: string }) => {
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
   const [queue, setQueue] = useState<QueueEntry[]>([]);
   const [showQR, setShowQR] = useState(false);
+  const [filterDate, setFilterDate] = useState("");
 
   useEffect(() => {
     setRestaurant(null);
@@ -311,6 +349,30 @@ const RestaurantDashboard = ({ restaurantId }: { restaurantId: string }) => {
       btoa(unescape(encodeURIComponent(svgData)));
   };
 
+  const exportHistory = () => {
+    const completed = queue.filter((e) => e.status === "completed");
+    const csvContent =
+      "data:text/csv;charset=utf-8," +
+      "Token,Name,Phone,Date,Time\n" +
+      completed
+        .map((e) => {
+          const date = e.createdAt?.toDate ? e.createdAt.toDate() : new Date();
+          return `${e.tokenNumber},${e.customerName},${e.customerPhone},${date.toLocaleDateString()},${date.toLocaleTimeString()}`;
+        })
+        .join("\n");
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute(
+      "download",
+      `${restaurant?.name || "restaurant"}-history.csv`,
+    );
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   const joinUrl = `${import.meta.env.VITE_QR_CODE_URL}/join?restaurantId=${restaurantId}`;
 
   if (!restaurant) {
@@ -321,23 +383,28 @@ const RestaurantDashboard = ({ restaurantId }: { restaurantId: string }) => {
     );
   }
 
+  const activeQueue = queue.filter((e) => e.status !== "completed");
+  const historyQueue = queue.filter((e) => e.status === "completed");
+
   return (
-    <div className="max-w-6xl mx-auto mt-8 px-6 pb-12">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+    <div className="max-w-7xl mx-auto mt-8 px-6 pb-12">
+      {/* Header Section */}
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-10">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">
+          <h1 className="text-4xl font-black text-gray-900 tracking-tight">
             {restaurant?.name}
           </h1>
-          <p className="text-gray-500 flex items-center gap-1 mt-1">
-            <Store className="w-4 h-4" /> {restaurant?.address}
+          <p className="text-gray-500 flex items-center gap-2 mt-2 font-medium">
+            <Store className="w-5 h-5 text-indigo-500" /> {restaurant?.address}
           </p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex flex-wrap items-center gap-4">
+          <LiveClock />
           <button
             onClick={() => setShowQR(!showQR)}
-            className="flex items-center gap-2 bg-white border border-gray-200 px-4 py-2 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors shadow-sm"
+            className="flex items-center gap-2 bg-white border border-gray-200 px-5 py-3 rounded-2xl text-gray-700 font-bold hover:bg-gray-50 transition-all shadow-sm"
           >
-            <QrCode className="w-4 h-4" /> {showQR ? "Hide QR" : "Show QR"}
+            <QrCode className="w-5 h-5" /> {showQR ? "Hide QR" : "Show QR"}
           </button>
         </div>
       </div>
@@ -345,23 +412,23 @@ const RestaurantDashboard = ({ restaurantId }: { restaurantId: string }) => {
       <AnimatePresence>
         {showQR && (
           <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="overflow-hidden mb-8"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="mb-10"
           >
-            <div className="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm flex flex-col items-center text-center">
-              <h3 className="text-lg font-semibold mb-4">Customer Scan QR</h3>
-              <div className="bg-white p-4 rounded-xl shadow-inner border border-gray-50 mb-6">
-                <QRCodeSVG id="qr-code-svg" value={joinUrl} size={200} />
+            <div className="bg-white p-10 rounded-[2.5rem] border border-gray-100 shadow-xl flex flex-col items-center text-center max-w-2xl mx-auto">
+              <h3 className="text-xl font-bold mb-6">Customer Scan QR</h3>
+              <div className="bg-white p-6 rounded-3xl shadow-inner border border-gray-50 mb-8">
+                <QRCodeSVG id="qr-code-svg" value={joinUrl} size={240} />
               </div>
               <button
                 onClick={downloadQRCode}
-                className="flex items-center gap-2 bg-indigo-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200 mb-6"
+                className="flex items-center gap-2 bg-indigo-600 text-white px-8 py-4 rounded-2xl font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200 mb-6"
               >
                 <Download className="w-5 h-5" /> Download QR for Print
               </button>
-              <p className="text-sm text-gray-500 max-w-xs">
+              <p className="text-sm text-gray-500 max-w-sm leading-relaxed">
                 Place this QR code at your reception counter for customers to
                 join the queue.
               </p>
@@ -369,7 +436,7 @@ const RestaurantDashboard = ({ restaurantId }: { restaurantId: string }) => {
                 href={joinUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="mt-2 text-indigo-600 text-xs hover:underline"
+                className="mt-4 text-indigo-600 text-sm font-bold hover:underline"
               >
                 {joinUrl}
               </a>
@@ -378,45 +445,50 @@ const RestaurantDashboard = ({ restaurantId }: { restaurantId: string }) => {
         )}
       </AnimatePresence>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Waiting List */}
-        <div className="lg:col-span-2 space-y-4">
-          <div className="flex items-center gap-2 mb-2">
-            <Users className="w-5 h-5 text-indigo-600" />
-            <h2 className="text-xl font-bold text-gray-900">Current Queue</h2>
-            <span className="bg-indigo-100 text-indigo-700 text-xs font-bold px-2 py-1 rounded-full">
-              {queue.filter((e) => e.status !== "completed").length} Active
-            </span>
-          </div>
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-10">
+        {/* Current Queue Section */}
+        <div className="xl:col-span-5 space-y-6">
+          <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm min-h-[500px]">
+            <div className="flex items-center justify-between mb-8">
+              <div className="flex items-center gap-3">
+                <div className="bg-indigo-50 p-2 rounded-lg">
+                  <Users className="w-5 h-5 text-indigo-600" />
+                </div>
+                <h2 className="text-2xl font-black text-gray-900">
+                  Current Queue
+                </h2>
+              </div>
+              <span className="bg-indigo-600 text-white text-xs font-black px-3 py-1.5 rounded-full uppercase tracking-wider">
+                {activeQueue.length} Active
+              </span>
+            </div>
 
-          <div className="space-y-3">
-            {queue
-              .filter((e) => e.status !== "completed")
-              .map((entry) => (
+            <div className="space-y-4">
+              {activeQueue.map((entry) => (
                 <motion.div
                   layout
                   key={entry.id}
-                  className={`p-5 rounded-2xl border flex items-center justify-between transition-all ${
+                  className={`p-6 rounded-3xl border flex items-center justify-between transition-all ${
                     entry.status === "called"
-                      ? "bg-amber-50 border-amber-200 shadow-sm"
+                      ? "bg-amber-50 border-amber-200 shadow-md scale-[1.02]"
                       : "bg-white border-gray-100 hover:border-indigo-200"
                   }`}
                 >
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-5">
                     <div
-                      className={`w-12 h-12 rounded-xl flex items-center justify-center font-bold text-lg ${
+                      className={`w-14 h-14 rounded-2xl flex items-center justify-center font-black text-xl shadow-sm ${
                         entry.status === "called"
-                          ? "bg-amber-200 text-amber-800"
+                          ? "bg-amber-500 text-white"
                           : "bg-indigo-100 text-indigo-700"
                       }`}
                     >
                       {entry.tokenNumber}
                     </div>
                     <div>
-                      <h4 className="font-bold text-gray-900">
+                      <h4 className="font-bold text-gray-900 text-lg">
                         {entry.customerName}
                       </h4>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-gray-500 font-medium">
                         {entry.customerPhone}
                       </p>
                     </div>
@@ -425,14 +497,14 @@ const RestaurantDashboard = ({ restaurantId }: { restaurantId: string }) => {
                     {entry.status === "waiting" ? (
                       <button
                         onClick={() => updateStatus(entry.id, "called")}
-                        className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-indigo-700 transition-colors"
+                        className="bg-indigo-600 text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-indigo-700 transition-all shadow-sm"
                       >
-                        Call Customer
+                        Call
                       </button>
                     ) : (
                       <button
                         onClick={() => updateStatus(entry.id, "completed")}
-                        className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-green-700 transition-colors flex items-center gap-1"
+                        className="bg-green-600 text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-green-700 transition-all shadow-sm flex items-center gap-2"
                       >
                         <CheckCircle2 className="w-4 h-4" /> Done
                       </button>
@@ -440,42 +512,135 @@ const RestaurantDashboard = ({ restaurantId }: { restaurantId: string }) => {
                   </div>
                 </motion.div>
               ))}
-            {queue.filter((e) => e.status !== "completed").length === 0 && (
-              <div className="text-center py-12 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
-                <Users className="w-8 h-8 text-gray-300 mx-auto mb-2" />
-                <p className="text-gray-500">No customers in the queue yet.</p>
-              </div>
-            )}
+              {activeQueue.length === 0 && (
+                <div className="text-center py-20 bg-gray-50/50 rounded-[2rem] border-2 border-dashed border-gray-100">
+                  <div className="bg-white w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm">
+                    <Users className="w-8 h-8 text-gray-200" />
+                  </div>
+                  <h3 className="text-gray-900 font-bold">
+                    No customers in the queue yet.
+                  </h3>
+                  <p className="text-gray-400 text-sm mt-1">
+                    When customers join, they will appear here in real-time.
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
-        {/* Stats / History */}
-        <div className="space-y-6">
-          <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-            <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <Clock className="w-4 h-4 text-indigo-600" /> Recent History
-            </h3>
-            <div className="space-y-3">
-              {queue
-                .filter((e) => e.status === "completed")
-                .slice(-5)
-                .reverse()
-                .map((entry) => (
-                  <div
-                    key={entry.id}
-                    className="flex items-center justify-between text-sm py-2 border-b border-gray-50 last:border-0"
-                  >
-                    <span className="text-gray-700">{entry.customerName}</span>
-                    <span className="text-gray-400">
-                      Token #{entry.tokenNumber}
-                    </span>
-                  </div>
-                ))}
-              {queue.filter((e) => e.status === "completed").length === 0 && (
-                <p className="text-xs text-gray-400 italic">
-                  No completed entries yet.
-                </p>
-              )}
+        {/* Recent History Section */}
+        <div className="xl:col-span-7 space-y-6">
+          <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+              <div className="flex items-center gap-3">
+                <div className="bg-indigo-50 p-2 rounded-lg">
+                  <Clock className="w-5 h-5 text-indigo-600" />
+                </div>
+                <h2 className="text-2xl font-black text-gray-900">
+                  Recent History
+                </h2>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="relative">
+                  <Calendar className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                  <input
+                    type="date"
+                    value={filterDate}
+                    onChange={(e) => setFilterDate(e.target.value)}
+                    className="pl-9 pr-4 py-2 bg-gray-50 border border-gray-100 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
+                  />
+                </div>
+                <button
+                  onClick={exportHistory}
+                  className="flex items-center gap-2 bg-white border border-gray-200 px-4 py-2 rounded-xl text-sm font-bold text-gray-700 hover:bg-gray-50 transition-all shadow-sm"
+                >
+                  <FileDown className="w-4 h-4" /> Export
+                </button>
+              </div>
+            </div>
+
+            <div className="overflow-hidden rounded-2xl border border-gray-50">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-gray-50/50">
+                    <th className="px-6 py-4 text-xs font-black text-gray-400 uppercase tracking-widest">
+                      Token
+                    </th>
+                    <th className="px-6 py-4 text-xs font-black text-gray-400 uppercase tracking-widest">
+                      Customer
+                    </th>
+                    <th className="px-6 py-4 text-xs font-black text-gray-400 uppercase tracking-widest">
+                      Date
+                    </th>
+                    <th className="px-6 py-4 text-xs font-black text-gray-400 uppercase tracking-widest">
+                      Time
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-50">
+                  {historyQueue
+                    .filter((entry) => {
+                      if (!filterDate) return true;
+                      const entryDate = entry.createdAt?.toDate
+                        ? entry.createdAt.toDate()
+                        : new Date();
+                      return (
+                        entryDate.toISOString().split("T")[0] === filterDate
+                      );
+                    })
+                    .slice()
+                    .reverse()
+                    .map((entry) => {
+                      const date = entry.createdAt?.toDate
+                        ? entry.createdAt.toDate()
+                        : new Date();
+                      return (
+                        <tr
+                          key={entry.id}
+                          className="hover:bg-gray-50/50 transition-colors"
+                        >
+                          <td className="px-6 py-4">
+                            <div className="w-12 h-12 rounded-full bg-indigo-50 flex items-center justify-center font-bold text-indigo-600 text-sm border border-indigo-100">
+                              {entry.tokenNumber}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="font-bold text-gray-900">
+                              {entry.customerName}
+                            </div>
+                            <div className="text-xs text-gray-400">
+                              {entry.customerPhone}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 text-sm text-gray-600 font-medium">
+                            {date.toLocaleDateString([], {
+                              month: "short",
+                              day: "numeric",
+                              year: "numeric",
+                            })}
+                          </td>
+                          <td className="px-6 py-4 text-sm text-gray-600 font-medium">
+                            {date.toLocaleTimeString([], {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  {historyQueue.length === 0 && (
+                    <tr>
+                      <td
+                        colSpan={4}
+                        className="px-6 py-12 text-center text-gray-400 italic text-sm"
+                      >
+                        No completed entries yet.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
