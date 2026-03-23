@@ -1,60 +1,62 @@
-import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { 
-  collection, 
-  onSnapshot, 
-  doc, 
-  getDoc, 
-  serverTimestamp, 
-  runTransaction
-} from 'firebase/firestore';
-import { db } from '../firebase';
-import { 
-  Users, 
-  CheckCircle2, 
-  Clock, 
-  UserPlus,
-  ArrowRight
-} from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
-import { Restaurant, QueueEntry, OperationType } from '../types';
-import { handleFirestoreError } from '../services/errorHandling';
+import React, { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
+import {
+  collection,
+  onSnapshot,
+  doc,
+  getDoc,
+  serverTimestamp,
+  runTransaction,
+} from "firebase/firestore";
+import { db } from "../firebase";
+import { Users, CheckCircle2, Clock, UserPlus, ArrowRight } from "lucide-react";
+import { motion, AnimatePresence } from "motion/react";
+import { Restaurant, QueueEntry, OperationType } from "../types";
+import { handleFirestoreError } from "../services/errorHandling";
 
 const CustomerJoin = () => {
   const [searchParams] = useSearchParams();
-  const restaurantId = searchParams.get('restaurantId');
+  const restaurantId = searchParams.get("restaurantId");
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
-  const [name, setName] = useState('');
-  const [phone, setPhone] = useState('');
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
   const [token, setToken] = useState<QueueEntry | null>(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [sessionTrigger, setSessionTrigger] = useState(0);
 
   // Restore session from localStorage
   useEffect(() => {
     if (!restaurantId) return;
-    
+
     const savedEntryId = localStorage.getItem(`queue_entry_${restaurantId}`);
     if (savedEntryId) {
-      const unsubscribe = onSnapshot(doc(db, 'restaurants', restaurantId, 'queue', savedEntryId), (snapshot) => {
-        if (snapshot.exists()) {
-          const data = snapshot.data() as any;
-          setToken({ id: snapshot.id, ...data } as QueueEntry);
-          
-          // Vibrate if called
-          if (data.status === 'called' && 'vibrate' in navigator) {
-            navigator.vibrate([200, 100, 200]);
+      const unsubscribe = onSnapshot(
+        doc(db, "restaurants", restaurantId, "queue", savedEntryId),
+        (snapshot) => {
+          if (snapshot.exists()) {
+            const data = snapshot.data() as any;
+            setToken({ id: snapshot.id, ...data } as QueueEntry);
+
+            // Vibrate if called
+            if (data.status === "called" && "vibrate" in navigator) {
+              navigator.vibrate([200, 100, 200]);
+            }
+          } else {
+            // Entry might have been deleted or doesn't exist anymore
+            localStorage.removeItem(`queue_entry_${restaurantId}`);
+            setToken(null);
           }
-        } else {
-          // Entry might have been deleted or doesn't exist anymore
-          localStorage.removeItem(`queue_entry_${restaurantId}`);
-          setToken(null);
-        }
-      }, (error) => {
-        console.error("onSnapshot error:", error);
-        handleFirestoreError(error, OperationType.GET, `restaurants/${restaurantId}/queue/${savedEntryId}`);
-      });
+        },
+        (error) => {
+          console.error("onSnapshot error:", error);
+          handleFirestoreError(
+            error,
+            OperationType.GET,
+            `restaurants/${restaurantId}/queue/${savedEntryId}`,
+          );
+        },
+      );
       return () => unsubscribe();
     }
   }, [restaurantId, sessionTrigger]);
@@ -62,7 +64,7 @@ const CustomerJoin = () => {
   useEffect(() => {
     if (!restaurantId) return;
     const fetchRestaurant = async () => {
-      const docSnap = await getDoc(doc(db, 'restaurants', restaurantId));
+      const docSnap = await getDoc(doc(db, "restaurants", restaurantId));
       if (docSnap.exists()) {
         setRestaurant({ id: docSnap.id, ...docSnap.data() } as Restaurant);
       }
@@ -74,12 +76,12 @@ const CustomerJoin = () => {
     e.preventDefault();
     if (!restaurantId) return;
     setLoading(true);
-    setError('');
+    setError("");
     try {
       await runTransaction(db, async (transaction) => {
-        const restaurantRef = doc(db, 'restaurants', restaurantId);
+        const restaurantRef = doc(db, "restaurants", restaurantId);
         const restaurantDoc = await transaction.get(restaurantRef);
-        
+
         if (!restaurantDoc.exists()) {
           throw new Error("Restaurant does not exist!");
         }
@@ -91,24 +93,32 @@ const CustomerJoin = () => {
         transaction.update(restaurantRef, { lastTokenNumber: nextToken });
 
         // Add new queue entry
-        const queueRef = doc(collection(db, 'restaurants', restaurantId, 'queue'));
+        const queueRef = doc(
+          collection(db, "restaurants", restaurantId, "queue"),
+        );
         transaction.set(queueRef, {
           customerName: name,
           customerPhone: phone,
           tokenNumber: nextToken,
-          status: 'waiting',
+          status: "waiting",
           createdAt: serverTimestamp(),
         });
 
         // Save to localStorage
         localStorage.setItem(`queue_entry_${restaurantId}`, queueRef.id);
-        setSessionTrigger(prev => prev + 1);
+        setSessionTrigger((prev) => prev + 1);
       });
     } catch (err) {
       console.error("Error joining queue:", err);
-      setError('Failed to join queue. This might be due to a permission error or a network issue. Please try again.');
+      setError(
+        "Failed to join queue. This might be due to a permission error or a network issue. Please try again.",
+      );
       try {
-        handleFirestoreError(err, OperationType.WRITE, `restaurants/${restaurantId}/queue`);
+        handleFirestoreError(
+          err,
+          OperationType.WRITE,
+          `restaurants/${restaurantId}/queue`,
+        );
       } catch (e) {
         // Already logged
       }
@@ -129,91 +139,144 @@ const CustomerJoin = () => {
       <div className="min-h-screen flex items-center justify-center p-6 bg-gray-50">
         <div className="text-center">
           <Clock className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-          <h2 className="text-xl font-bold text-gray-900">Invalid Queue Link</h2>
-          <p className="text-gray-500 mt-2">Please scan a valid restaurant QR code.</p>
+          <h2 className="text-xl font-bold text-gray-900">
+            Invalid Queue Link
+          </h2>
+          <p className="text-gray-500 mt-2">
+            Please scan a valid restaurant QR code.
+          </p>
         </div>
       </div>
     );
   }
 
   if (token) {
-    const isCalled = token.status === 'called';
-    const isCompleted = token.status === 'completed';
+    const isCalled = token.status === "called";
+    const isCompleted = token.status === "completed";
 
     return (
-      <div className={`min-h-screen transition-colors duration-500 flex items-center justify-center p-6 ${
-        isCalled ? 'bg-amber-500' : isCompleted ? 'bg-green-600' : 'bg-indigo-600'
-      }`}>
+      <div
+        className={`min-h-screen transition-colors duration-500 flex items-center justify-center p-2 ${
+          isCalled
+            ? "bg-amber-500"
+            : isCompleted
+              ? "bg-green-600"
+              : "bg-indigo-600"
+        }`}
+      >
         <AnimatePresence mode="wait">
-          <motion.div 
+          <motion.div
             key={token.status}
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 1.2, opacity: 0 }}
             className={`bg-white w-full max-w-md rounded-[2.5rem] p-10 shadow-2xl text-center relative overflow-hidden border-8 ${
-              isCalled ? 'border-amber-400' : isCompleted ? 'border-green-400' : 'border-white'
+              isCalled
+                ? "border-amber-400"
+                : isCompleted
+                  ? "border-green-400"
+                  : "border-white"
             }`}
           >
             {isCalled && (
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 className="absolute inset-0 bg-amber-500/20 pointer-events-none animate-pulse"
               />
             )}
 
-            <div className={`w-24 h-24 rounded-3xl flex items-center justify-center mx-auto mb-8 transform rotate-3 ${
-              isCalled ? 'bg-amber-500 text-white shadow-lg shadow-amber-200 animate-bounce' : 
-              isCompleted ? 'bg-green-100 text-green-600' : 
-              'bg-indigo-50 text-indigo-600'
-            }`}>
-              {isCalled ? <Users className="w-12 h-12" /> : 
-               isCompleted ? <CheckCircle2 className="w-12 h-12" /> : 
-               <Clock className="w-12 h-12" />}
+            <div
+              className={`w-24 h-24 rounded-3xl flex items-center justify-center mx-auto mb-8 transform rotate-3 ${
+                isCalled
+                  ? "bg-amber-500 text-white shadow-lg shadow-amber-200 animate-bounce"
+                  : isCompleted
+                    ? "bg-green-100 text-green-600"
+                    : "bg-indigo-50 text-indigo-600"
+              }`}
+            >
+              {isCalled ? (
+                <Users className="w-12 h-12" />
+              ) : isCompleted ? (
+                <CheckCircle2 className="w-12 h-12" />
+              ) : (
+                <Clock className="w-12 h-12" />
+              )}
             </div>
 
-            <h2 className={`font-black mb-2 tracking-tight ${
-              isCalled ? 'text-4xl text-amber-600' : 'text-2xl text-gray-900'
-            }`}>
-              {isCalled ? "IT'S YOUR TURN!" : 
-               isCompleted ? "Thank You!" : 
-               "You're in the queue!"}
+            <h2
+              className={`font-black mb-2 tracking-tight ${
+                isCalled ? "text-4xl text-amber-600" : "text-2xl text-gray-900"
+              }`}
+            >
+              {isCalled
+                ? "IT'S YOUR TURN!"
+                : isCompleted
+                  ? "Thank You!"
+                  : "You're in the queue!"}
             </h2>
-            <p className="text-gray-500 mb-10 font-medium uppercase tracking-widest text-sm">{restaurant?.name}</p>
-            
-            <div className={`rounded-[2rem] p-10 mb-10 transition-all transform ${
-              isCalled ? 'bg-amber-600 text-white scale-110 shadow-xl shadow-amber-200' : 
-              isCompleted ? 'bg-green-50' : 'bg-gray-50'
-            }`}>
-              <p className={`text-xs uppercase tracking-[0.2em] font-black mb-4 ${
-                isCalled ? 'text-amber-100' : 'text-gray-400'
-              }`}>Token Number</p>
-              <h1 className={`text-8xl font-black leading-none ${
-                isCalled ? 'text-white' : isCompleted ? 'text-green-600' : 'text-indigo-600'
-              }`}>
+            <p className="text-gray-500 mb-10 font-medium uppercase tracking-widest text-sm">
+              {restaurant?.name}
+            </p>
+
+            <div
+              className={`rounded-[2rem] p-10 mb-10 transition-all transform ${
+                isCalled
+                  ? "bg-amber-600 text-white scale-110 shadow-xl shadow-amber-200"
+                  : isCompleted
+                    ? "bg-green-50"
+                    : "bg-gray-50"
+              }`}
+            >
+              <p
+                className={`text-xs uppercase tracking-[0.2em] font-black mb-4 ${
+                  isCalled ? "text-amber-100" : "text-gray-400"
+                }`}
+              >
+                Token Number
+              </p>
+              <h1
+                className={`text-8xl font-black leading-none ${
+                  isCalled
+                    ? "text-white"
+                    : isCompleted
+                      ? "text-green-600"
+                      : "text-indigo-600"
+                }`}
+              >
                 {token.tokenNumber}
               </h1>
             </div>
 
-            <div className={`p-6 rounded-2xl mb-8 flex flex-col items-center justify-center gap-3 ${
-              isCalled ? 'bg-white border-2 border-amber-500 text-amber-600' : 
-              isCompleted ? 'bg-green-600 text-white' : 
-              'bg-indigo-50 text-indigo-700'
-            }`}>
+            <div
+              className={`p-6 rounded-2xl mb-8 flex flex-col items-center justify-center gap-3 ${
+                isCalled
+                  ? "bg-white border-2 border-amber-500 text-amber-600"
+                  : isCompleted
+                    ? "bg-green-600 text-white"
+                    : "bg-indigo-50 text-indigo-700"
+              }`}
+            >
               {isCalled ? (
                 <>
-                  <span className="text-2xl font-black uppercase tracking-tighter">Please Proceed Now</span>
-                  <span className="text-sm font-bold opacity-80">Go to the reception counter immediately.</span>
+                  <span className="text-2xl font-black uppercase tracking-tighter">
+                    Please Proceed Now
+                  </span>
+                  <span className="text-sm font-bold opacity-80">
+                    Go to the reception counter immediately.
+                  </span>
                 </>
               ) : isCompleted ? (
                 <>
                   <span className="font-bold text-lg">Visit Completed</span>
-                  <span className="text-sm opacity-90">We hope you enjoyed your meal!</span>
+                  <span className="text-sm opacity-90">
+                    We hope you enjoyed your meal!
+                  </span>
                 </>
               ) : (
                 <>
                   <div className="flex items-center gap-2">
-                    <Clock className="w-5 h-5 animate-spin-slow" /> 
+                    <Clock className="w-5 h-5 animate-spin-slow" />
                     <span className="font-bold">Waiting for your turn...</span>
                   </div>
                 </>
@@ -221,7 +284,7 @@ const CustomerJoin = () => {
             </div>
 
             {isCompleted && (
-              <button 
+              <button
                 onClick={handleLeave}
                 className="w-full py-3 text-gray-500 font-medium hover:text-gray-700 transition-colors"
               >
@@ -242,7 +305,7 @@ const CustomerJoin = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="bg-white w-full max-w-md rounded-2xl p-8 shadow-sm border border-gray-100"
@@ -263,10 +326,12 @@ const CustomerJoin = () => {
 
         <form onSubmit={handleJoin} className="space-y-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Your Name</label>
-            <input 
-              type="text" 
-              required 
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Your Name
+            </label>
+            <input
+              type="text"
+              required
               value={name}
               onChange={(e) => setName(e.target.value)}
               className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
@@ -274,22 +339,26 @@ const CustomerJoin = () => {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
-            <input 
-              type="tel" 
-              required 
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Phone Number
+            </label>
+            <input
+              type="tel"
+              required
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
               placeholder="Enter your phone number"
             />
           </div>
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             disabled={loading}
             className="w-full bg-indigo-600 text-white py-4 rounded-xl font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 flex items-center justify-center gap-2"
           >
-            {loading ? 'Joining...' : (
+            {loading ? (
+              "Joining..."
+            ) : (
               <>
                 Get Token <ArrowRight className="w-5 h-5" />
               </>
