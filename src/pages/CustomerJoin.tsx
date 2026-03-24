@@ -252,7 +252,7 @@ const CustomerJoin = () => {
             </p>
 
             <div
-              className={`rounded-[2rem] p-6 sm:p-8 mb-6 transition-all transform ${
+              className={`rounded-4xl p-6 sm:p-8 mb-6 transition-all transform ${
                 isCalled
                   ? "bg-amber-600 text-white scale-110 shadow-xl shadow-amber-200"
                   : isCompleted
@@ -302,7 +302,7 @@ const CustomerJoin = () => {
                 <>
                   <span className="font-bold text-lg">Visit Completed</span>
                   <span className="text-sm opacity-90">
-                    We hope you enjoyed your meal!
+                    Sit relax and enjoy your meal!
                   </span>
                 </>
               ) : (

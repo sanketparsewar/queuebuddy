@@ -248,7 +248,7 @@ const Home = ({ user }: { user: User | null }) => {
                 viewport={{ once: true }}
                 className="flex justify-center lg:justify-start"
               >
-                <div className="relative w-72 h-[580px] bg-indigo-600 rounded-[3rem] p-3 shadow-2xl border-[8px] border-gray-900">
+                <div className="relative w-72 h-145 bg-indigo-600 rounded-[3rem] p-3 shadow-2xl border-8 border-gray-900">
                   <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-6 bg-gray-900 rounded-b-2xl z-20"></div>
                   <div className="relative h-full w-full bg-white rounded-[2.2rem] overflow-hidden flex flex-col p-6">
                     {/* Icon Header */}
@@ -269,7 +269,7 @@ const Home = ({ user }: { user: User | null }) => {
                     </div>
 
                     {/* Token Box */}
-                    <div className="bg-gray-50 rounded-[2rem] p-8 text-center mb-8">
+                    <div className="bg-gray-50 rounded-4xl p-8 text-center mb-8">
                       <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">
                         Token Number
                       </div>

@@ -168,7 +168,8 @@ const RestaurantDashboard = () => {
 
   const baseUrl =
     (import.meta as any).env.VITE_APP_URL || window.location.origin;
-  const joinUrl = `${baseUrl}/join?restaurantId=${restaurantId}`;
+  const cleanBaseUrl = baseUrl.endsWith("/") ? baseUrl.slice(0, -1) : baseUrl;
+  const joinUrl = `${cleanBaseUrl}/join?restaurantId=${restaurantId}`;
 
   const [copySuccess, setCopySuccess] = useState(false);
 
@@ -211,444 +212,560 @@ const RestaurantDashboard = () => {
   );
 
   return (
-    <div className="max-w-7xl mx-auto mt-8 px-6 pb-12">
-      {/* Export Modal */}
-      <AnimatePresence>
-        {showExportModal && (
-          <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-white w-full max-w-md rounded-4xl p-8 shadow-2xl"
-            >
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-bold text-gray-900">
-                  Export History
-                </h3>
-                <button
-                  onClick={() => setShowExportModal(false)}
-                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-                >
-                  <X className="w-5 h-5 text-gray-500" />
-                </button>
-              </div>
+    <div className="min-h-screen bg-[#F8FAFC]">
+      <div className="max-w-7xl mx-auto pt-6 sm:pt-10 px-4 sm:px-6 lg:px-8 pb-24">
+        {/* Export Modal */}
+        <AnimatePresence>
+          {showExportModal && (
+            <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                className="bg-white w-full max-w-md rounded-4xl p-8 shadow-2xl"
+              >
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-xl font-bold text-gray-900">
+                    Export History
+                  </h3>
+                  <button
+                    onClick={() => setShowExportModal(false)}
+                    className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                  >
+                    <X className="w-5 h-5 text-gray-500" />
+                  </button>
+                </div>
 
-              <div className="space-y-4 mb-8">
-                <button
-                  onClick={setTodayRange}
-                  className={`w-full py-3 px-4 rounded-xl font-bold text-left transition-all border ${
-                    exportStartDate ===
-                      new Date().toISOString().split("T")[0] &&
-                    exportEndDate === new Date().toISOString().split("T")[0]
-                      ? "bg-indigo-50 border-indigo-200 text-indigo-600"
-                      : "bg-white border-gray-100 text-gray-700 hover:bg-gray-50"
-                  }`}
-                >
-                  Today
-                </button>
-                <button
-                  onClick={setYesterdayRange}
-                  className={`w-full py-3 px-4 rounded-xl font-bold text-left transition-all border ${
-                    exportStartDate ===
-                      new Date(Date.now() - 86400000)
-                        .toISOString()
-                        .split("T")[0] &&
-                    exportEndDate ===
-                      new Date(Date.now() - 86400000)
-                        .toISOString()
-                        .split("T")[0]
-                      ? "bg-indigo-50 border-indigo-200 text-indigo-600"
-                      : "bg-white border-gray-100 text-gray-700 hover:bg-gray-50"
-                  }`}
-                >
-                  Yesterday
-                </button>
+                <div className="space-y-4 mb-8">
+                  <button
+                    onClick={setTodayRange}
+                    className={`w-full py-3 px-4 rounded-xl font-bold text-left transition-all border ${
+                      exportStartDate ===
+                        new Date().toISOString().split("T")[0] &&
+                      exportEndDate === new Date().toISOString().split("T")[0]
+                        ? "bg-indigo-50 border-indigo-200 text-indigo-600"
+                        : "bg-white border-slate-100 text-slate-700 hover:bg-slate-50"
+                    }`}
+                  >
+                    Today
+                  </button>
+                  <button
+                    onClick={setYesterdayRange}
+                    className={`w-full py-3 px-4 rounded-xl font-bold text-left transition-all border ${
+                      exportStartDate ===
+                        new Date(Date.now() - 86400000)
+                          .toISOString()
+                          .split("T")[0] &&
+                      exportEndDate ===
+                        new Date(Date.now() - 86400000)
+                          .toISOString()
+                          .split("T")[0]
+                        ? "bg-indigo-50 border-indigo-200 text-indigo-600"
+                        : "bg-white border-slate-100 text-slate-700 hover:bg-slate-50"
+                    }`}
+                  >
+                    Yesterday
+                  </button>
 
-                <div className="pt-4 border-t border-gray-100">
-                  <p className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4">
-                    Custom Range
-                  </p>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-xs font-bold text-gray-500 mb-1">
-                        Start Date
-                      </label>
-                      <input
-                        type="date"
-                        value={exportStartDate}
-                        onChange={(e) => setExportStartDate(e.target.value)}
-                        className="w-full px-3 py-2 bg-gray-50 border border-gray-100 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-bold text-gray-500 mb-1">
-                        End Date
-                      </label>
-                      <input
-                        type="date"
-                        value={exportEndDate}
-                        onChange={(e) => setExportEndDate(e.target.value)}
-                        className="w-full px-3 py-2 bg-gray-50 border border-gray-100 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500"
-                      />
+                  <div className="pt-4 border-t border-slate-100">
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4">
+                      Custom Range
+                    </p>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5">
+                          Start Date
+                        </label>
+                        <input
+                          type="date"
+                          value={exportStartDate}
+                          onChange={(e) => setExportStartDate(e.target.value)}
+                          className="w-full px-3 py-2 bg-slate-50 border border-slate-100 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500 font-bold text-slate-700"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5">
+                          End Date
+                        </label>
+                        <input
+                          type="date"
+                          value={exportEndDate}
+                          onChange={(e) => setExportEndDate(e.target.value)}
+                          className="w-full px-3 py-2 bg-slate-50 border border-slate-100 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500 font-bold text-slate-700"
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
+
+                <button
+                  onClick={() => exportHistory(exportStartDate, exportEndDate)}
+                  className="w-full bg-indigo-600 text-white py-4 rounded-xl font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 flex items-center justify-center gap-2"
+                >
+                  <FileDown className="w-5 h-5" /> Download CSV
+                </button>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
+
+        {/* Header Section */}
+        <div className="bg-white rounded-[2.5rem] p-6 sm:p-8 border border-slate-200/60 shadow-sm mb-8 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-50/50 rounded-full -mr-32 -mt-32 blur-3xl"></div>
+          <div className="relative flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+            <div className="space-y-3">
+              <div className="flex items-center gap-4">
+                <div className="bg-indigo-600 p-3 rounded-2xl shadow-xl shadow-indigo-100 shrink-0">
+                  <Store className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h1 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight leading-tight">
+                    {restaurant?.name}
+                  </h1>
+                  <p className="text-slate-500 flex items-center gap-2 font-medium text-sm sm:text-base mt-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
+                    {restaurant?.address}
+                  </p>
+                </div>
               </div>
-
+            </div>
+            <div className="flex flex-wrap items-center gap-3 sm:gap-4">
               <button
-                onClick={() => exportHistory(exportStartDate, exportEndDate)}
-                className="w-full bg-indigo-600 text-white py-4 rounded-xl font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 flex items-center justify-center gap-2"
+                onClick={() => setShowQR(!showQR)}
+                className={`flex items-center gap-2 px-6 py-3.5 rounded-2xl font-bold transition-all shadow-sm border ${
+                  showQR
+                    ? "bg-indigo-600 border-indigo-600 text-white shadow-indigo-200"
+                    : "bg-white border-slate-200 text-slate-700 hover:border-indigo-200 hover:text-indigo-600"
+                }`}
               >
-                <FileDown className="w-5 h-5" /> Download CSV
+                <QrCode className="w-5 h-5" />{" "}
+                {showQR ? "Hide QR Code" : "Show QR Code"}
               </button>
-            </motion.div>
+              <div className="h-10 w-px bg-slate-100 hidden lg:block mx-2"></div>
+              <LiveClock />
+            </div>
           </div>
-        )}
-      </AnimatePresence>
-
-      {/* Header Section */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-10">
-        <div>
-          <h1 className="text-4xl font-black text-gray-900 tracking-tight">
-            {restaurant?.name}
-          </h1>
-          <p className="text-gray-500 flex items-center gap-2 mt-2 font-medium">
-            <Store className="w-5 h-5 text-indigo-500" /> {restaurant?.address}
-          </p>
         </div>
-        <div className="flex flex-wrap items-center gap-4">
-          <button
-            onClick={() => setShowQR(!showQR)}
-            className="flex items-center gap-2 bg-white border border-gray-200 px-5 py-3 rounded-2xl text-gray-700 font-bold hover:bg-gray-50 transition-all shadow-sm"
-          >
-            <QrCode className="w-5 h-5" /> {showQR ? "Hide QR" : "Show QR"}
-          </button>
-          <LiveClock />
-        </div>
-      </div>
 
-      <AnimatePresence>
+        {/* Stats Overview */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 mb-10">
+          {[
+            {
+              label: "Total Today",
+              value: queue.filter((e) => {
+                const d = e.createdAt?.toDate
+                  ? e.createdAt.toDate()
+                  : new Date();
+                return (
+                  d.toISOString().split("T")[0] ===
+                  new Date().toISOString().split("T")[0]
+                );
+              }).length,
+              icon: Users,
+              bgColor: "bg-indigo-50",
+              textColor: "text-indigo-600",
+            },
+            {
+              label: "Waiting",
+              value: activeQueue.filter((e) => e.status === "waiting").length,
+              icon: Clock,
+              bgColor: "bg-amber-50",
+              textColor: "text-amber-600",
+            },
+            {
+              label: "Called",
+              value: activeQueue.filter((e) => e.status === "called").length,
+              icon: Users,
+              bgColor: "bg-blue-50",
+              textColor: "text-blue-600",
+            },
+            {
+              label: "Completed",
+              value: historyQueue.filter((e) => {
+                const d = e.createdAt?.toDate
+                  ? e.createdAt.toDate()
+                  : new Date();
+                return (
+                  d.toISOString().split("T")[0] ===
+                  new Date().toISOString().split("T")[0]
+                );
+              }).length,
+              icon: CheckCircle2,
+              bgColor: "bg-green-50",
+              textColor: "text-green-600",
+            },
+          ].map((stat, i) => (
+            <div
+              key={i}
+              className="bg-white p-5 sm:p-6 rounded-3xl border border-slate-100 shadow-sm"
+            >
+              <div className="flex items-center gap-3 mb-3">
+                <div
+                  className={`p-2 rounded-xl ${stat.bgColor} ${stat.textColor}`}
+                >
+                  <stat.icon className="w-4 h-4" />
+                </div>
+                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                  {stat.label}
+                </span>
+              </div>
+              <div className="text-2xl sm:text-3xl font-black text-slate-900">
+                {stat.value}
+              </div>
+            </div>
+          ))}
+        </div>
+
         {showQR && (
           <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="mb-10"
+            initial={{ opacity: 0, scale: 0.95, y: -20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: -20 }}
+            className="mb-12"
           >
-            <div className="bg-white p-6 sm:p-10 rounded-4xl sm:rounded-[2.5rem] border border-gray-100 shadow-xl flex flex-col items-center text-center max-w-2xl mx-auto">
-              <h3 className="text-xl font-bold mb-6">Customer Scan QR</h3>
-              <div className="bg-white p-4 sm:p-6 rounded-3xl shadow-inner border border-gray-50 mb-8">
-                <QRCodeSVG
-                  id="qr-code-svg"
-                  value={joinUrl}
-                  size={window.innerWidth < 640 ? 180 : 240}
-                />
+            <div className="bg-white p-8 sm:p-12 rounded-[3rem] border border-indigo-100 shadow-2xl shadow-indigo-100/50 flex flex-col items-center text-center max-w-3xl mx-auto relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-full h-2 bg-indigo-600"></div>
+              <div className="bg-indigo-50 text-indigo-600 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest mb-8">
+                Customer Registration Point
+              </div>
+
+              <div className="bg-white p-6 sm:p-8 rounded-[2.5rem] shadow-xl border border-slate-50 mb-10 relative group">
+                <div className="absolute -inset-4 bg-indigo-600/5 rounded-[3rem] blur-xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <div className="relative">
+                  <QRCodeSVG
+                    id="qr-code-svg"
+                    value={joinUrl}
+                    size={window.innerWidth < 640 ? 200 : 280}
+                  />
+                </div>
               </div>
 
               {/* URL Warning */}
               {baseUrl.includes("ais-dev-") && (
-                <div className="mb-6 p-4 bg-amber-50 border border-amber-100 rounded-2xl text-amber-700 text-sm font-medium max-w-sm">
-                  <p className="flex items-center gap-2">
-                    <Users className="w-4 h-4" />
-                    <span>
-                      Note: You are using the <strong>Private Dev URL</strong>.
-                    </span>
-                  </p>
-                  <p className="mt-1 text-xs opacity-80">
-                    To test on other phones, please use the{" "}
-                    <strong>Shared App URL</strong> from AI Studio to avoid 403
-                    errors.
-                  </p>
-                </div>
-              )}
-
-              <div className="flex flex-col sm:flex-row gap-4 mb-6">
-                <button
-                  onClick={downloadQRCode}
-                  className="flex items-center gap-2 bg-indigo-600 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-2xl font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200"
-                >
-                  <Download className="w-5 h-5" /> Download QR
-                </button>
-                <button
-                  onClick={copyToClipboard}
-                  className={`flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-4 rounded-2xl font-bold transition-all shadow-sm border ${
-                    copySuccess
-                      ? "bg-green-50 border-green-200 text-green-600"
-                      : "bg-white border-gray-200 text-gray-700 hover:bg-gray-50"
-                  }`}
-                >
-                  {copySuccess ? "Copied!" : "Copy Link"}
-                </button>
-              </div>
-              <p className="text-sm text-gray-500 max-w-sm leading-relaxed px-4">
-                Place this QR code at your reception counter for customers to
-                join the queue.
-              </p>
-              <a
-                href={joinUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="mt-4 text-indigo-600 text-sm font-bold hover:underline break-all px-4"
-              >
-                {joinUrl}
-              </a>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      <div className="grid grid-cols-1 xl:grid-cols-12 gap-10">
-        {/* Current Queue Section */}
-        <div className="xl:col-span-5 space-y-6">
-          <div className="bg-white p-6 sm:p-8 rounded-4xl sm:rounded-[2.5rem] border border-gray-100 shadow-sm min-h-100 sm:min-h-125">
-            <div className="flex items-center justify-between mb-8">
-              <div className="flex items-center gap-3">
-                <div className="bg-indigo-50 p-2 rounded-lg">
-                  <Users className="w-5 h-5 text-indigo-600" />
-                </div>
-                <h2 className="text-xl sm:text-2xl font-black text-gray-900">
-                  Current Queue
-                </h2>
-              </div>
-              <span className="bg-indigo-600 text-white text-[10px] sm:text-xs font-black px-2 sm:px-3 py-1 sm:py-1.5 rounded-full uppercase tracking-wider">
-                {activeQueue.length} Active
-              </span>
-            </div>
-
-            <div className="space-y-4">
-              {activeQueue.map((entry) => (
-                <motion.div
-                  layout
-                  key={entry.id}
-                  className={`p-4 sm:p-6 rounded-2xl sm:rounded-3xl border flex items-center justify-between transition-all ${
-                    entry.status === "called"
-                      ? "bg-amber-50 border-amber-200 shadow-md scale-[1.02]"
-                      : "bg-white border-gray-100 hover:border-indigo-200"
-                  }`}
-                >
-                  <div className="flex items-center gap-3 sm:gap-5">
-                    <div
-                      className={`w-10 h-10 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl flex items-center justify-center font-black text-lg sm:text-xl shadow-sm ${
-                        entry.status === "called"
-                          ? "bg-amber-500 text-white"
-                          : "bg-indigo-100 text-indigo-700"
-                      }`}
-                    >
-                      {entry.tokenNumber}
+                <div className="mb-8 p-5 bg-amber-50 border border-amber-100 rounded-3xl text-amber-700 text-sm font-medium max-w-md">
+                  <div className="flex items-start gap-3">
+                    <div className="bg-amber-100 p-1.5 rounded-lg mt-0.5">
+                      <Users className="w-4 h-4 text-amber-600" />
                     </div>
-                    <div className="min-w-0">
-                      <h4 className="font-bold text-gray-900 text-base sm:text-lg truncate">
-                        {entry.customerName}
-                      </h4>
-                      <p className="text-xs sm:text-sm text-gray-500 font-medium truncate">
-                        {entry.customerPhone}
+                    <div className="text-left">
+                      <p className="font-bold">Private Dev URL Detected</p>
+                      <p className="mt-1 text-xs opacity-80 leading-relaxed">
+                        To test on other devices, please use the{" "}
+                        <strong>Shared App URL</strong> from AI Studio. The
+                        current URL is restricted to your session.
                       </p>
                     </div>
                   </div>
-                  <div className="flex gap-2 shrink-0">
-                    <button
-                      onClick={() => deleteEntry(entry.id)}
-                      className="p-2.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
-                      title="Delete Record"
+                </div>
+              )}
+
+              <div className="flex flex-col sm:flex-row gap-4 mb-8 w-full sm:w-auto">
+                <button
+                  onClick={downloadQRCode}
+                  className="flex items-center justify-center gap-3 bg-indigo-600 text-white px-10 py-4 rounded-2xl font-black hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200 group active:scale-95"
+                >
+                  <Download className="w-5 h-5 group-hover:-translate-y-0.5 transition-transform" />{" "}
+                  Download QR
+                </button>
+                <button
+                  onClick={copyToClipboard}
+                  className={`flex items-center justify-center gap-3 px-10 py-4 rounded-2xl font-black transition-all shadow-sm border ${
+                    copySuccess
+                      ? "bg-green-50 border-green-200 text-green-600"
+                      : "bg-white border-slate-200 text-slate-700 hover:border-indigo-200 hover:text-indigo-600"
+                  }`}
+                >
+                  {copySuccess ? (
+                    <>
+                      <CheckCircle2 className="w-5 h-5" /> Copied!
+                    </>
+                  ) : (
+                    <>
+                      <QrCode className="w-5 h-5" /> Copy Link
+                    </>
+                  )}
+                </button>
+              </div>
+              <p className="text-slate-500 font-medium max-w-md leading-relaxed mb-6 text-sm">
+                Display this QR code at your reception. Customers scan it to
+                join your digital queue instantly.
+              </p>
+              <div className="bg-slate-50 px-6 py-3 rounded-xl border border-slate-100 w-full max-w-md">
+                <code className="text-indigo-600 text-xs font-bold break-all">
+                  {joinUrl}
+                </code>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-10">
+          {/* Current Queue Section */}
+          <div className="xl:col-span-5 space-y-6">
+            <div className="bg-white p-6 sm:p-8 rounded-[2.5rem] border border-slate-100 shadow-sm min-h-150 flex flex-col">
+              <div className="flex items-center justify-between mb-8">
+                <div className="flex items-center gap-4">
+                  <div className="bg-indigo-600 p-3 rounded-2xl shadow-lg shadow-indigo-100">
+                    <Users className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-2xl font-black text-slate-900 leading-tight">
+                      Current Queue
+                    </h2>
+                    <p className="text-slate-400 text-[10px] font-black uppercase tracking-[0.2em] mt-1">
+                      Live Updates
+                    </p>
+                  </div>
+                </div>
+                <div className="flex flex-col items-end">
+                  <span className="bg-indigo-50 text-indigo-700 text-[10px] font-black px-4 py-2 rounded-full uppercase tracking-widest border border-indigo-100/50">
+                    {activeQueue.length} Waiting
+                  </span>
+                </div>
+              </div>
+
+              <div className="space-y-4 flex-1">
+                <AnimatePresence mode="popLayout">
+                  {activeQueue.map((entry) => (
+                    <motion.div
+                      layout
+                      key={entry.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.95 }}
+                      className={`p-5 sm:p-6 rounded-4xl border-2 flex items-center justify-between transition-all relative overflow-hidden group ${
+                        entry.status === "called"
+                          ? "bg-amber-50/50 border-amber-200 shadow-xl shadow-amber-100/20 scale-[1.02] z-10"
+                          : "bg-white border-slate-50 hover:border-indigo-100 hover:shadow-md"
+                      }`}
                     >
-                      <Trash2 className="w-5 h-5" />
-                    </button>
-                    {entry.status === "waiting" ? (
-                      <button
-                        onClick={() => updateStatus(entry.id, "called")}
-                        className="bg-indigo-600 text-white px-3 sm:px-5 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold hover:bg-indigo-700 transition-all shadow-sm"
-                      >
-                        Call
-                      </button>
-                    ) : (
-                      <button
-                        onClick={() => updateStatus(entry.id, "completed")}
-                        className="bg-green-600 text-white px-3 sm:px-5 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold hover:bg-green-700 transition-all shadow-sm flex items-center gap-1 sm:gap-2"
-                      >
-                        <CheckCircle2 className="w-3 h-3 sm:w-4 sm:h-4" /> Done
-                      </button>
+                      {entry.status === "called" && (
+                        <motion.div
+                          animate={{ opacity: [0.05, 0.15, 0.05] }}
+                          transition={{ duration: 2, repeat: Infinity }}
+                          className="absolute inset-0 bg-amber-400"
+                        />
+                      )}
+                      <div className="flex items-center gap-4 sm:gap-5 relative z-10">
+                        <div
+                          className={`w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center font-black text-xl sm:text-2xl shadow-sm transition-all ${
+                            entry.status === "called"
+                              ? "bg-amber-500 text-white ring-4 ring-amber-100"
+                              : "bg-slate-50 text-slate-400 group-hover:bg-indigo-600 group-hover:text-white group-hover:scale-105"
+                          }`}
+                        >
+                          {entry.tokenNumber}
+                        </div>
+                        <div className="min-w-0">
+                          <h4 className="font-bold text-slate-900 text-lg sm:text-xl truncate leading-tight">
+                            {entry.customerName}
+                          </h4>
+                          <p className="text-sm text-slate-400 font-medium mt-0.5 truncate">
+                            {entry.customerPhone}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 sm:gap-3 shrink-0 relative z-10">
+                        <button
+                          onClick={() => deleteEntry(entry.id)}
+                          className="p-3 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-2xl transition-all"
+                          title="Remove from queue"
+                        >
+                          <Trash2 className="w-5 h-5" />
+                        </button>
+                        {entry.status === "waiting" ? (
+                          <button
+                            onClick={() => updateStatus(entry.id, "called")}
+                            className="bg-indigo-600 text-white px-6 sm:px-8 py-3 sm:py-3.5 rounded-2xl text-sm font-black hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 active:scale-95"
+                          >
+                            Call
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => updateStatus(entry.id, "completed")}
+                            className="bg-green-600 text-white px-6 sm:px-8 py-3 sm:py-3.5 rounded-2xl text-sm font-black hover:bg-green-700 transition-all shadow-lg shadow-green-100 flex items-center gap-2 active:scale-95"
+                          >
+                            <CheckCircle2 className="w-4 h-4" /> Done
+                          </button>
+                        )}
+                      </div>
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+
+                {activeQueue.length === 0 && (
+                  <div className="flex-1 flex flex-col items-center justify-center py-20 bg-slate-50/50 rounded-[2.5rem] border-2 border-dashed border-slate-200/60">
+                    <div className="bg-white w-20 h-20 rounded-3xl flex items-center justify-center mb-6 shadow-sm border border-slate-100">
+                      <Users className="w-10 h-10 text-slate-200" />
+                    </div>
+                    <h3 className="text-slate-900 font-bold text-xl">
+                      Queue is empty
+                    </h3>
+                    <p className="text-slate-400 text-sm mt-2 max-w-55 text-center leading-relaxed font-medium">
+                      New customers will appear here automatically as they join.
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Recent History Section */}
+          <div className="xl:col-span-7 space-y-6">
+            <div className="bg-white p-6 sm:p-8 rounded-[2.5rem] border border-slate-100 shadow-sm">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-8">
+                <div className="flex items-center gap-4">
+                  <div className="bg-indigo-600 p-3 rounded-2xl shadow-lg shadow-indigo-100">
+                    <Clock className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-2xl font-black text-slate-900 leading-tight">
+                      Recent History
+                    </h2>
+                    <p className="text-slate-400 text-[10px] font-black uppercase tracking-[0.2em] mt-1">
+                      Archive
+                    </p>
+                  </div>
+                </div>
+                <div className="flex flex-wrap items-center gap-3">
+                  <div className="relative flex-1 sm:flex-none">
+                    <Calendar className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                    <input
+                      type="date"
+                      value={filterDate}
+                      onChange={(e) => {
+                        setFilterDate(e.target.value);
+                        setCurrentPage(1);
+                      }}
+                      className="w-full sm:w-auto pl-11 pr-4 py-3 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold text-slate-700 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                    />
+                  </div>
+                  <button
+                    onClick={() => setShowExportModal(true)}
+                    className="flex items-center gap-2 bg-white border border-slate-200 px-6 py-3 rounded-2xl text-sm font-bold text-slate-700 hover:border-indigo-200 hover:text-indigo-600 transition-all shadow-sm active:scale-95"
+                  >
+                    <FileDown className="w-4 h-4" /> Export
+                  </button>
+                </div>
+              </div>
+
+              <div className="overflow-x-auto rounded-4xl border border-slate-50">
+                <table className="w-full text-left border-collapse min-w-150">
+                  <thead>
+                    <tr className="bg-slate-50/80">
+                      <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                        Token
+                      </th>
+                      <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                        Customer
+                      </th>
+                      <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                        Date
+                      </th>
+                      <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                        Time
+                      </th>
+                      <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-right">
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-50">
+                    {paginatedHistory.map((entry) => {
+                      const date = entry.createdAt?.toDate
+                        ? entry.createdAt.toDate()
+                        : new Date();
+                      return (
+                        <tr
+                          key={entry.id}
+                          className="hover:bg-indigo-50/30 transition-colors group"
+                        >
+                          <td className="px-8 py-6">
+                            <div className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center font-black text-indigo-600 text-sm border border-slate-100 shadow-sm group-hover:border-indigo-200 transition-colors">
+                              {entry.tokenNumber}
+                            </div>
+                          </td>
+                          <td className="px-8 py-6">
+                            <div className="font-bold text-slate-900 text-base">
+                              {entry.customerName}
+                            </div>
+                            <div className="text-xs text-slate-400 font-medium mt-0.5">
+                              {entry.customerPhone}
+                            </div>
+                          </td>
+                          <td className="px-8 py-6 text-sm text-slate-600 font-bold">
+                            {date.toLocaleDateString([], {
+                              month: "short",
+                              day: "numeric",
+                              year: "numeric",
+                            })}
+                          </td>
+                          <td className="px-8 py-6 text-sm text-slate-600 font-bold">
+                            {date.toLocaleTimeString([], {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })}
+                          </td>
+                          <td className="px-8 py-6 text-right">
+                            <button
+                              onClick={() => deleteEntry(entry.id)}
+                              className="p-3 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-2xl transition-all opacity-0 group-hover:opacity-100"
+                              title="Delete Record"
+                            >
+                              <Trash2 className="w-5 h-5" />
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                    {filteredHistory.length === 0 && (
+                      <tr>
+                        <td colSpan={5} className="px-6 py-16 text-center">
+                          <div className="flex flex-col items-center gap-3">
+                            <div className="bg-slate-50 p-4 rounded-2xl">
+                              <Calendar className="w-8 h-8 text-slate-200" />
+                            </div>
+                            <p className="text-slate-400 font-bold text-sm">
+                              No completed entries for this date.
+                            </p>
+                          </div>
+                        </td>
+                      </tr>
                     )}
-                  </div>
-                </motion.div>
-              ))}
-              {activeQueue.length === 0 && (
-                <div className="text-center py-16 sm:py-20 bg-gray-50/50 rounded-4xl border-2 border-dashed border-gray-100">
-                  <div className="bg-white w-12 h-12 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm">
-                    <Users className="w-6 h-6 sm:w-8 sm:h-8 text-gray-200" />
-                  </div>
-                  <h3 className="text-gray-900 font-bold text-sm sm:text-base">
-                    No customers in the queue yet.
-                  </h3>
-                  <p className="text-gray-400 text-xs sm:text-sm mt-1">
-                    When customers join, they will appear here in real-time.
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Pagination Controls */}
+              {totalPages > 1 && (
+                <div className="mt-8 flex flex-col sm:flex-row items-center justify-between border-t border-slate-100 pt-8 gap-6">
+                  <p className="text-sm text-slate-400 font-black uppercase tracking-widest">
+                    Page <span className="text-slate-900">{currentPage}</span>{" "}
+                    of <span className="text-slate-900">{totalPages}</span>
                   </p>
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() =>
+                        setCurrentPage((prev) => Math.max(prev - 1, 1))
+                      }
+                      disabled={currentPage === 1}
+                      className="px-6 py-3 border border-slate-200 rounded-2xl text-sm font-black text-slate-700 hover:border-indigo-200 hover:text-indigo-600 disabled:opacity-30 transition-all active:scale-95"
+                    >
+                      Previous
+                    </button>
+                    <button
+                      onClick={() =>
+                        setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                      }
+                      disabled={currentPage === totalPages}
+                      className="px-6 py-3 border border-slate-200 rounded-2xl text-sm font-black text-slate-700 hover:border-indigo-200 hover:text-indigo-600 disabled:opacity-30 transition-all active:scale-95"
+                    >
+                      Next
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
-          </div>
-        </div>
-
-        {/* Recent History Section */}
-        <div className="xl:col-span-7 space-y-6">
-          <div className="bg-white p-6 sm:p-8 rounded-4xl sm:rounded-[2.5rem] border border-gray-100 shadow-sm">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
-              <div className="flex items-center gap-3">
-                <div className="bg-indigo-50 p-2 rounded-lg">
-                  <Clock className="w-5 h-5 text-indigo-600" />
-                </div>
-                <h2 className="text-xl sm:text-2xl font-black text-gray-900">
-                  Recent History
-                </h2>
-              </div>
-              <div className="flex flex-wrap items-center gap-3">
-                <div className="relative flex-1 sm:flex-none">
-                  <Calendar className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                  <input
-                    type="date"
-                    value={filterDate}
-                    onChange={(e) => {
-                      setFilterDate(e.target.value);
-                      setCurrentPage(1);
-                    }}
-                    className="w-full sm:w-auto pl-9 pr-4 py-2 bg-gray-50 border border-gray-100 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
-                  />
-                </div>
-                <button
-                  onClick={() => setShowExportModal(true)}
-                  className="flex items-center gap-2 bg-white border border-gray-200 px-4 py-2 rounded-xl text-sm font-bold text-gray-700 hover:bg-gray-50 transition-all shadow-sm"
-                >
-                  <FileDown className="w-4 h-4" /> Export
-                </button>
-              </div>
-            </div>
-
-            <div className="overflow-x-auto rounded-2xl border border-gray-50">
-              <table className="w-full text-left border-collapse min-w-125">
-                <thead>
-                  <tr className="bg-gray-50/50">
-                    <th className="px-4 sm:px-6 py-4 text-[10px] sm:text-xs font-black text-gray-400 uppercase tracking-widest">
-                      Token
-                    </th>
-                    <th className="px-4 sm:px-6 py-4 text-[10px] sm:text-xs font-black text-gray-400 uppercase tracking-widest">
-                      Customer
-                    </th>
-                    <th className="px-4 sm:px-6 py-4 text-[10px] sm:text-xs font-black text-gray-400 uppercase tracking-widest">
-                      Date
-                    </th>
-                    <th className="px-4 sm:px-6 py-4 text-[10px] sm:text-xs font-black text-gray-400 uppercase tracking-widest">
-                      Time
-                    </th>
-                    <th className="px-4 sm:px-6 py-4 text-[10px] sm:text-xs font-black text-gray-400 uppercase tracking-widest text-right">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-50">
-                  {paginatedHistory.map((entry) => {
-                    const date = entry.createdAt?.toDate
-                      ? entry.createdAt.toDate()
-                      : new Date();
-                    return (
-                      <tr
-                        key={entry.id}
-                        className="hover:bg-gray-50/50 transition-colors"
-                      >
-                        <td className="px-4 sm:px-6 py-4">
-                          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-indigo-50 flex items-center justify-center font-bold text-indigo-600 text-xs sm:text-sm border border-indigo-100">
-                            {entry.tokenNumber}
-                          </div>
-                        </td>
-                        <td className="px-4 sm:px-6 py-4">
-                          <div className="font-bold text-gray-900 text-sm sm:text-base">
-                            {entry.customerName}
-                          </div>
-                          <div className="text-[10px] sm:text-xs text-gray-400">
-                            {entry.customerPhone}
-                          </div>
-                        </td>
-                        <td className="px-4 sm:px-6 py-4 text-xs sm:text-sm text-gray-600 font-medium">
-                          {date.toLocaleDateString([], {
-                            month: "short",
-                            day: "numeric",
-                            year: "numeric",
-                          })}
-                        </td>
-                        <td className="px-4 sm:px-6 py-4 text-xs sm:text-sm text-gray-600 font-medium">
-                          {date.toLocaleTimeString([], {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })}
-                        </td>
-                        <td className="px-4 sm:px-6 py-4 text-right">
-                          <button
-                            onClick={() => deleteEntry(entry.id)}
-                            className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
-                            title="Delete Record"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                  {filteredHistory.length === 0 && (
-                    <tr>
-                      <td
-                        colSpan={4}
-                        className="px-6 py-12 text-center text-gray-400 italic text-sm"
-                      >
-                        No completed entries for this date.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-
-            {/* Pagination Controls */}
-            {totalPages > 1 && (
-              <div className="mt-6 flex flex-col sm:flex-row items-center justify-between border-t border-gray-100 pt-6 gap-4">
-                <p className="text-xs sm:text-sm text-gray-500 font-medium">
-                  Showing{" "}
-                  <span className="text-gray-900">
-                    {(currentPage - 1) * recordsPerPage + 1}
-                  </span>{" "}
-                  to{" "}
-                  <span className="text-gray-900">
-                    {Math.min(
-                      currentPage * recordsPerPage,
-                      filteredHistory.length,
-                    )}
-                  </span>{" "}
-                  of{" "}
-                  <span className="text-gray-900">
-                    {filteredHistory.length}
-                  </span>{" "}
-                  results
-                </p>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() =>
-                      setCurrentPage((prev) => Math.max(prev - 1, 1))
-                    }
-                    disabled={currentPage === 1}
-                    className="px-3 sm:px-4 py-2 border border-gray-200 rounded-xl text-xs sm:text-sm font-bold text-gray-700 hover:bg-gray-50 disabled:opacity-50 transition-all"
-                  >
-                    Previous
-                  </button>
-                  <button
-                    onClick={() =>
-                      setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-                    }
-                    disabled={currentPage === totalPages}
-                    className="px-3 sm:px-4 py-2 border border-gray-200 rounded-xl text-xs sm:text-sm font-bold text-gray-700 hover:bg-gray-50 disabled:opacity-50 transition-all"
-                  >
-                    Next
-                  </button>
-                </div>
-              </div>
-            )}
           </div>
         </div>
       </div>
