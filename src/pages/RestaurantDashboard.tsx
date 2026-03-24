@@ -215,12 +215,12 @@ const RestaurantDashboard = () => {
       {/* Export Modal */}
       <AnimatePresence>
         {showExportModal && (
-          <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-white w-full max-w-md rounded-[2rem] p-8 shadow-2xl"
+              className="bg-white w-full max-w-md rounded-4xl p-8 shadow-2xl"
             >
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-xl font-bold text-gray-900">
