@@ -141,6 +141,9 @@ const CustomerJoin = () => {
         localStorage.setItem(`queue_entry_${restaurantId}`, queueRef.id);
         setSessionTrigger((prev) => prev + 1);
       });
+      setName("");
+      setPhone("");
+      setMembers("1");
     } catch (err) {
       console.error("Error joining queue:", err);
       setError(
@@ -165,11 +168,6 @@ const CustomerJoin = () => {
       localStorage.removeItem(`queue_entry_${restaurantId}`);
       setToken(null);
       window.close();
-
-      // fallback if blocked
-      setTimeout(() => {
-        window.location.href = "about:blank";
-      }, 200);
     }
   };
 
@@ -259,7 +257,7 @@ const CustomerJoin = () => {
             </p>
 
             <div
-              className={`rounded-[2rem] p-6 sm:p-8 mb-6 transition-all transform ${
+              className={`rounded-4xl p-6 sm:p-8 mb-6 transition-all transform ${
                 isCalled
                   ? "bg-amber-600 text-white scale-110 shadow-xl shadow-amber-200"
                   : isCompleted
