@@ -27,9 +27,6 @@ import {
   Zap,
   CheckCircle2,
   Heart,
-  Instagram,
-  Twitter,
-  Facebook,
 } from "lucide-react";
 import { motion } from "motion/react";
 
@@ -40,10 +37,13 @@ import Navbar from "./components/Navbar";
 import RestaurantRegistration from "./pages/RestaurantRegistration";
 import RestaurantDashboard from "./pages/RestaurantDashboard";
 import CustomerJoin from "./pages/CustomerJoin";
+import { FaFacebook, FaInstagram, FaLinkedin } from "react-icons/fa";
+import { IconType } from "react-icons/lib";
 
 const Home = ({ user }: { user: User | null }) => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const socialIcons: IconType[] = [FaInstagram, FaLinkedin, FaFacebook];
 
   useEffect(() => {
     if (!user) {
@@ -433,7 +433,7 @@ const Home = ({ user }: { user: User | null }) => {
                   Built for speed, reliability, and customer satisfaction.
                 </p>
                 <div className="flex gap-4">
-                  {[Instagram, Twitter, Facebook].map((Icon, i) => (
+                  {socialIcons.map((Icon, i) => (
                     <motion.a
                       key={i}
                       href="#"
