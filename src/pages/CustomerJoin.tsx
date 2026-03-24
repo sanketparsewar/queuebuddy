@@ -165,6 +165,11 @@ const CustomerJoin = () => {
       localStorage.removeItem(`queue_entry_${restaurantId}`);
       setToken(null);
       window.close();
+
+      // fallback if blocked
+      setTimeout(() => {
+        window.location.href = "about:blank";
+      }, 200);
     }
   };
 
@@ -393,7 +398,7 @@ const CustomerJoin = () => {
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Number of Members
             </label>
-            <select
+            <selecte
               value={members}
               onChange={(e) => setMembers(e.target.value)}
               className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all bg-white"
@@ -404,7 +409,7 @@ const CustomerJoin = () => {
                 </option>
               ))}
               <option value="9+">9+</option>
-            </select>
+            </selecte>
           </div>
           <button
             type="submit"
