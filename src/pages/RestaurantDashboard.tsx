@@ -212,8 +212,8 @@ const RestaurantDashboard = () => {
   );
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC]">
-      <div className="max-w-7xl mx-auto pt-6 sm:pt-10 px-4 sm:px-6 lg:px-8 pb-24">
+    <div className="min-h-screen bg-linear-to-b from-slate-50 to-white">
+      <div className="w-full max-w-375 mx-auto pt-6 sm:pt-10 px-4 sm:px-6 lg:px-10 xl:px-12 2xl:px-16 pb-24">
         {/* Export Modal */}
         <AnimatePresence>
           {showExportModal && (
