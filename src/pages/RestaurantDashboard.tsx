@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { QRCodeSVG } from "qrcode.react";
+import { User } from "firebase/auth";
 import {
   collection,
   onSnapshot,
@@ -30,7 +31,7 @@ import { motion, AnimatePresence } from "motion/react";
 import LiveClock from "../components/LiveClock";
 import { Restaurant, QueueEntry } from "../types";
 
-const RestaurantDashboard = () => {
+const RestaurantDashboard = ({ user }: { user: User | null }) => {
   const { restaurantId } = useParams<{ restaurantId: string }>();
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
   const [queue, setQueue] = useState<QueueEntry[]>([]);
@@ -96,12 +97,74 @@ const RestaurantDashboard = () => {
     const img = new Image();
 
     img.onload = () => {
-      canvas.width = 1000;
-      canvas.height = 1000;
+      // Set dimensions for a professional poster-like QR code
+      const width = 1000;
+      const height = 1200;
+      canvas.width = width;
+      canvas.height = height;
+
       if (ctx) {
+        // Background
         ctx.fillStyle = "white";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(img, 50, 50, 900, 900);
+        ctx.fillRect(0, 0, width, height);
+
+        // 1. Restaurant Name (Top)
+        ctx.fillStyle = "#0f172a"; // slate-900
+        ctx.font = "bold 60px system-ui, -apple-system, sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(restaurant?.name || "Restaurant", width / 2, 120);
+
+        // 2. QR Code (Middle)
+        const qrSize = 700;
+        const qrX = (width - qrSize) / 2;
+        const qrY = 220;
+
+        // Add a subtle border/container for the QR code
+        ctx.strokeStyle = "#f1f5f9"; // slate-100
+        ctx.lineWidth = 2;
+        ctx.strokeRect(qrX - 20, qrY - 20, qrSize + 40, qrSize + 40);
+
+        ctx.drawImage(img, qrX, qrY, qrSize, qrSize);
+
+        // 3. Footer (Bottom)
+        const footerY = 1050;
+        const footerText = "Scan2Queue";
+        ctx.font = "bold 50px system-ui, -apple-system, sans-serif";
+        const textWidth = ctx.measureText(footerText).width;
+        const iconSize = 44;
+        const gap = 20;
+        const totalFooterWidth = iconSize + gap + textWidth;
+        const startX = (width - totalFooterWidth) / 2;
+
+        // Draw Icon (Clock/Logo representation)
+        const iconX = startX + iconSize / 2;
+        const iconCenterY = footerY;
+
+        // Outer circle
+        ctx.beginPath();
+        ctx.arc(iconX, iconCenterY, iconSize / 2, 0, Math.PI * 2);
+        ctx.fillStyle = "#4f46e5"; // indigo-600
+        ctx.fill();
+
+        // Clock hands
+        ctx.beginPath();
+        ctx.moveTo(iconX, iconCenterY - iconSize / 4);
+        ctx.lineTo(iconX, iconCenterY);
+        ctx.lineTo(iconX + iconSize / 4, iconCenterY);
+        ctx.strokeStyle = "white";
+        ctx.lineWidth = 5;
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+        ctx.stroke();
+
+        // Draw Text
+        ctx.fillStyle = "#4f46e5";
+        ctx.textAlign = "left";
+        ctx.textBaseline = "middle";
+        ctx.fillText(footerText, startX + iconSize + gap, footerY);
+
+        // Download
         const pngFile = canvas.toDataURL("image/png");
         const downloadLink = document.createElement("a");
         downloadLink.download = `${restaurant?.name || "restaurant"}-qr-code.png`;
@@ -428,15 +491,12 @@ const RestaurantDashboard = () => {
                 Customer Registration Point
               </div>
 
-              <div className="bg-white p-6 sm:p-8 rounded-[2.5rem] shadow-xl border border-slate-50 mb-10 relative group">
-                <div className="absolute -inset-4 bg-indigo-600/5 rounded-[3rem] blur-xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                <div className="relative">
-                  <QRCodeSVG
-                    id="qr-code-svg"
-                    value={joinUrl}
-                    size={window.innerWidth < 640 ? 200 : 280}
-                  />
-                </div>
+              <div className="bg-white p-4 sm:p-6 rounded-2xl shadow-lg border border-slate-50 mb-8">
+                <QRCodeSVG
+                  id="qr-code-svg"
+                  value={joinUrl}
+                  size={window.innerWidth < 640 ? 180 : 240}
+                />
               </div>
 
               {/* URL Warning */}
@@ -624,7 +684,7 @@ const RestaurantDashboard = () => {
 
           {/* Recent History Section */}
           <div className="xl:col-span-7 space-y-6">
-            <div className="bg-white p-5 sm:p-8 rounded-4xl sm:rounded-[2.5rem] border border-slate-100 shadow-sm">
+            <div className="bg-white p-5 sm:p-8 rounded-2xl sm:rounded-3xl border border-slate-100 shadow-sm">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-6 mb-6 sm:mb-8">
                 <div className="flex items-center gap-3 sm:gap-4">
                   <div className="bg-indigo-600 p-2.5 sm:p-3 rounded-xl sm:rounded-2xl shadow-lg shadow-indigo-100">
