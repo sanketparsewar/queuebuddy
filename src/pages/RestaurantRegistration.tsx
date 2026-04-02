@@ -60,8 +60,9 @@ const RestaurantRegistration = ({ user }: { user: User | null }) => {
         lastTokenDate: new Date().toISOString().split("T")[0],
         averageWaitTimePerCustomer: parseInt(waitTime) || 10,
         createdAt: serverTimestamp(),
+        subscriptionStatus: "none",
       });
-      navigate(`/dashboard/${docRef.id}`, { replace: true });
+      navigate(`/subscription/${docRef.id}`, { replace: true });
     } catch (error) {
       console.error("Error registering restaurant:", error);
     } finally {

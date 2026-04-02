@@ -20,7 +20,11 @@ service cloud.firestore {
              data.ownerUid is string &&
              (!('lastTokenNumber' in data) || (data.lastTokenNumber is int && data.lastTokenNumber >= 0)) &&
              (!('lastTokenDate' in data) || (data.lastTokenDate is string)) &&
-             (!('createdAt' in data) || data.createdAt is timestamp);
+             (!('createdAt' in data) || data.createdAt is timestamp) &&
+             (!('subscriptionStatus' in data) || data.subscriptionStatus in ['trial', 'active', 'expired', 'none']) &&
+             (!('subscriptionPlan' in data) || data.subscriptionPlan in ['free_trial', 'monthly_199']) &&
+             (!('trialEndDate' in data) || data.trialEndDate is string) &&
+             (!('paymentExpiryDate' in data) || data.paymentExpiryDate is string);
     }
 
     function isValidQueueEntry(data) {

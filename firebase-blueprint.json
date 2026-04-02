@@ -11,9 +11,13 @@
         "lastTokenNumber": { "type": "integer", "description": "The last token number assigned today." },
         "lastTokenDate": { "type": "string", "description": "The date when the last token was assigned (YYYY-MM-DD)." },
         "averageWaitTimePerCustomer": { "type": "integer", "description": "The estimated wait time per customer in minutes." },
-        "createdAt": { "type": "string", "format": "date-time", "description": "When the restaurant was registered." }
+        "createdAt": { "type": "string", "format": "date-time", "description": "When the restaurant was registered." },
+        "subscriptionStatus": { "type": "string", "enum": ["trial", "active", "expired", "none"], "description": "The current subscription status." },
+        "subscriptionPlan": { "type": "string", "enum": ["free_trial", "monthly_199"], "description": "The selected subscription plan." },
+        "trialEndDate": { "type": "string", "format": "date-time", "description": "When the free trial ends." },
+        "paymentExpiryDate": { "type": "string", "format": "date-time", "description": "When the current payment period expires." }
       },
-      "required": ["name", "address", "ownerUid", "lastTokenNumber", "lastTokenDate", "averageWaitTimePerCustomer", "createdAt"]
+      "required": ["name", "address", "ownerUid", "lastTokenNumber", "lastTokenDate", "averageWaitTimePerCustomer", "createdAt", "subscriptionStatus"]
     },
     "QueueEntry": {
       "title": "Queue Entry",

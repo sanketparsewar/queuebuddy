@@ -37,6 +37,10 @@ export interface Restaurant {
   lastTokenDate?: string; // Format: YYYY-MM-DD
   averageWaitTimePerCustomer: number;
   createdAt: any;
+  subscriptionStatus: "trial" | "active" | "expired" | "none";
+  subscriptionPlan?: "free_trial" | "monthly_199";
+  trialEndDate?: string; // ISO string
+  paymentExpiryDate?: string; // ISO string
 }
 
 export interface QueueEntry {

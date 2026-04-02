@@ -29,6 +29,7 @@ import {
   Heart,
 } from "lucide-react";
 import { motion } from "motion/react";
+import { Restaurant } from "./types";
 
 // Components
 import Navbar from "./components/Navbar";
@@ -37,6 +38,7 @@ import Navbar from "./components/Navbar";
 import RestaurantRegistration from "./pages/RestaurantRegistration";
 import RestaurantDashboard from "./pages/RestaurantDashboard";
 import CustomerJoin from "./pages/CustomerJoin";
+import Subscription from "./pages/Subscription";
 import { FaFacebook, FaInstagram, FaLinkedin } from "react-icons/fa";
 import { IconType } from "react-icons/lib";
 
@@ -77,8 +79,18 @@ const Home = ({
         );
         const querySnapshot = await getDocs(q);
         if (!querySnapshot.empty) {
+          const restaurantData = querySnapshot.docs[0].data() as Restaurant;
           const id = querySnapshot.docs[0].id;
-          navigate(`/dashboard/${id}`, { replace: true });
+
+          // Check subscription status
+          if (
+            restaurantData.subscriptionStatus === "none" ||
+            !restaurantData.subscriptionStatus
+          ) {
+            navigate(`/subscription/${id}`, { replace: true });
+          } else {
+            navigate(`/dashboard/${id}`, { replace: true });
+          }
         } else {
           navigate("/register", { replace: true });
         }
@@ -607,6 +619,10 @@ const AppContent = ({
               <Navigate to="/" replace />
             )
           }
+        />
+        <Route
+          path="/subscription/:restaurantId"
+          element={user ? <Subscription /> : <Navigate to="/" replace />}
         />
         <Route
           path="/dashboard/:restaurantId"
