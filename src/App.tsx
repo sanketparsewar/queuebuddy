@@ -48,6 +48,7 @@ const Home = ({
   onMockLogin: () => void;
 }) => {
   const [loading, setLoading] = useState(true);
+  const [redirectError, setRedirectError] = useState(false);
   const navigate = useNavigate();
   const socialIcons: IconType[] = [FaInstagram, FaLinkedin, FaFacebook];
 
@@ -59,11 +60,13 @@ const Home = ({
     // If no user, we're not loading (show hero)
     if (!user) {
       setLoading(false);
+      setRedirectError(false);
       return;
     }
 
     // If user is present, we are loading until the check finishes
     setLoading(true);
+    setRedirectError(false);
 
     const checkRestaurant = async () => {
       try {
@@ -81,6 +84,7 @@ const Home = ({
         }
       } catch (error) {
         console.error("Error checking restaurant:", error);
+        setRedirectError(true);
         setLoading(false);
       }
     };
@@ -88,10 +92,15 @@ const Home = ({
     checkRestaurant();
   }, [user, navigate]);
 
-  if (loading || (user && loading)) {
+  if (loading || (user && !redirectError)) {
     return (
-      <div className="min-h-[60vh] flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/40 backdrop-blur-sm">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-indigo-600 font-bold animate-pulse">
+            Preparing your workspace...
+          </p>
+        </div>
       </div>
     );
   }
