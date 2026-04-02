@@ -75,9 +75,7 @@ const Subscription = () => {
     const razorpayKey = import.meta.env.VITE_RAZORPAY_KEY_ID;
 
     if (!razorpayKey) {
-      alert(
-        "Razorpay Key ID is missing. Please configure VITE_RAZORPAY_KEY_ID in the settings.",
-      );
+      alert("Missing Razorpay key");
       return;
     }
 
@@ -85,86 +83,81 @@ const Subscription = () => {
 
     try {
       const appUrl = import.meta.env.VITE_APP_URL || "";
-      // 1. Create order on the server
-      const orderResponse = await fetch(`${appUrl}/api/razorpay/order`, {
+
+      // 1️⃣ Create order on backend
+      const orderRes = await fetch(`${appUrl}/api/razorpay/order`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ amount: 19900, currency: "INR" }),
+        body: JSON.stringify({
+          amount: 19900, // ₹199 in paise
+          currency: "INR",
+        }),
       });
 
-      if (!orderResponse.ok) throw new Error("Failed to create order");
-      const order = await orderResponse.json();
+      const order = await orderRes.json();
 
-      // 2. Open Razorpay Checkout
+      // 2️⃣ Open Razorpay Checkout
       const options = {
         key: razorpayKey,
         amount: order.amount,
         currency: order.currency,
         name: "Scan2Queue",
         description: `Subscription for ${restaurant.name}`,
-        image: "/favicon.svg",
         order_id: order.id,
-        handler: async function (response: any) {
-          // 3. Verify payment on the server
-          try {
-            const verifyResponse = await fetch(
-              `${appUrl}/api/razorpay/verify`,
-              {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  razorpay_order_id: response.razorpay_order_id,
-                  razorpay_payment_id: response.razorpay_payment_id,
-                  razorpay_signature: response.razorpay_signature,
-                }),
-              },
-            );
 
-            if (!verifyResponse.ok)
-              throw new Error("Payment verification failed");
-
-            const expiryDate = new Date();
-            expiryDate.setMonth(expiryDate.getMonth() + 1);
-
-            await updateDoc(doc(db, "restaurants", restaurantId), {
-              subscriptionStatus: "active",
-              subscriptionPlan: "monthly_199",
-              paymentExpiryDate: expiryDate.toISOString(),
-              razorpayPaymentId: response.razorpay_payment_id,
-              razorpayOrderId: response.razorpay_order_id,
-            });
-
-            navigate(`/dashboard/${restaurantId}`, { replace: true });
-          } catch (error) {
-            console.error("Error updating subscription after payment:", error);
-            alert(
-              "Payment successful but failed to update subscription. Please contact support.",
-            );
-          }
-        },
         prefill: {
           name: restaurant.name,
           email: "",
           contact: "",
         },
+
         theme: {
           color: "#4f46e5",
+        },
+
+        handler: async function (response: any) {
+          // 3️⃣ Verify payment
+          const verifyRes = await fetch(`${appUrl}/api/razorpay/verify`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+            }),
+          });
+
+          if (!verifyRes.ok) {
+            alert("Payment verification failed");
+            return;
+          }
+
+          const expiryDate = new Date();
+          expiryDate.setMonth(expiryDate.getMonth() + 1);
+
+          await updateDoc(doc(db, "restaurants", restaurantId), {
+            subscriptionStatus: "active",
+            subscriptionPlan: "monthly_199",
+            paymentExpiryDate: expiryDate.toISOString(),
+            razorpayPaymentId: response.razorpay_payment_id,
+            razorpayOrderId: response.razorpay_order_id,
+          });
+
+          navigate(`/dashboard/${restaurantId}`, { replace: true });
         },
       };
 
       const rzp = new (window as any).Razorpay(options);
 
-      rzp.on("payment.failed", function (response: any) {
-        alert(
-          `Oops! Something went wrong.\nPayment Failed: ${response.error.description}`,
-        );
+      rzp.on("payment.failed", (err: any) => {
+        alert(err.error.description || "Payment failed");
         setProcessing(false);
       });
 
       rzp.open();
-    } catch (error) {
-      console.error("Error in payment flow:", error);
-      alert("Oops! Something went wrong.\nPayment Failed");
+    } catch (err) {
+      console.error(err);
+      alert("Something went wrong");
     } finally {
       setProcessing(false);
     }
