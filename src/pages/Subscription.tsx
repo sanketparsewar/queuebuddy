@@ -9,10 +9,8 @@ import {
   CreditCard,
   ArrowRight,
   Loader2,
-  AlertCircle,
-  X,
 } from "lucide-react";
-import { motion, AnimatePresence } from "motion/react";
+import { motion } from "motion/react";
 import { Restaurant } from "../types";
 
 const Subscription = () => {
@@ -21,7 +19,6 @@ const Subscription = () => {
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState(false);
-  const [paymentError, setPaymentError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!restaurantId) return;
@@ -78,7 +75,7 @@ const Subscription = () => {
     const razorpayKey = import.meta.env.VITE_RAZORPAY_KEY_ID;
 
     if (!razorpayKey) {
-      setPaymentError(
+      alert(
         "Razorpay Key ID is missing. Please configure VITE_RAZORPAY_KEY_ID in the settings.",
       );
       return;
@@ -140,7 +137,7 @@ const Subscription = () => {
             navigate(`/dashboard/${restaurantId}`, { replace: true });
           } catch (error) {
             console.error("Error updating subscription after payment:", error);
-            setPaymentError(
+            alert(
               "Payment successful but failed to update subscription. Please contact support.",
             );
           }
@@ -149,52 +146,25 @@ const Subscription = () => {
           name: restaurant.name,
           email: "",
           contact: "",
-          method: "upi",
         },
         theme: {
           color: "#4f46e5",
         },
-        config: {
-          display: {
-            blocks: {
-              upi: {
-                name: "Pay via UPI",
-                instruments: [
-                  {
-                    method: "upi",
-                  },
-                ],
-              },
-            },
-            sequence: ["block.upi"],
-            preferences: {
-              show_default_blocks: true,
-            },
-          },
-        },
       };
 
-      console.log("Razorpay Options:", options);
       const rzp = new (window as any).Razorpay(options);
 
       rzp.on("payment.failed", function (response: any) {
-        // Only set error if it's not a user cancellation (optional, but good for UX)
-        console.error("Razorpay Payment Failed:", response.error);
-        setPaymentError(
-          response.error.description || "Payment failed. Please try again.",
+        alert(
+          `Oops! Something went wrong.\nPayment Failed: ${response.error.description}`,
         );
         setProcessing(false);
       });
 
       rzp.open();
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error in payment flow:", error);
-      // Only show generic error if it wasn't already handled by payment.failed
-      if (!paymentError) {
-        setPaymentError(
-          error.message || "Oops! Something went wrong. Payment Failed",
-        );
-      }
+      alert("Oops! Something went wrong.\nPayment Failed");
     } finally {
       setProcessing(false);
     }
@@ -227,45 +197,6 @@ const Subscription = () => {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] py-12 px-4 sm:px-6 lg:px-8">
-      <AnimatePresence>
-        {paymentError && (
-          <div className="fixed inset-0 z-100 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="bg-white rounded-4xl p-8 max-w-md w-full shadow-2xl border border-slate-100 relative overflow-hidden"
-            >
-              <div className="absolute top-0 left-0 w-full h-2 bg-red-500"></div>
-              <button
-                onClick={() => setPaymentError(null)}
-                className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-full transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
-
-              <div className="flex flex-col items-center text-center">
-                <div className="w-16 h-16 bg-red-50 rounded-2xl flex items-center justify-center mb-6">
-                  <AlertCircle className="w-10 h-10 text-red-500" />
-                </div>
-                <h3 className="text-2xl font-black text-slate-900 mb-2">
-                  Payment Issue
-                </h3>
-                <p className="text-slate-500 font-medium leading-relaxed mb-8">
-                  {paymentError}
-                </p>
-                <button
-                  onClick={() => setPaymentError(null)}
-                  className="w-full bg-slate-900 text-white py-4 rounded-2xl font-bold text-lg hover:bg-slate-800 transition-all shadow-lg"
-                >
-                  Got it
-                </button>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
-
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-12">
           <motion.div
