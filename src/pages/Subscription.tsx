@@ -82,6 +82,7 @@ const Subscription = () => {
     }
 
     setProcessing(true);
+    let alertShown = false;
 
     try {
       const appUrl = import.meta.env.VITE_APP_URL || "";
@@ -137,9 +138,12 @@ const Subscription = () => {
             navigate(`/dashboard/${restaurantId}`, { replace: true });
           } catch (error) {
             console.error("Error updating subscription after payment:", error);
-            alert(
-              "Payment successful but failed to update subscription. Please contact support.",
-            );
+            if (!alertShown) {
+              alert(
+                "Payment successful but failed to update subscription. Please contact support.",
+              );
+              alertShown = true;
+            }
           }
         },
         prefill: {
@@ -155,16 +159,23 @@ const Subscription = () => {
       const rzp = new (window as any).Razorpay(options);
 
       rzp.on("payment.failed", function (response: any) {
-        alert(
-          `Oops! Something went wrong.\nPayment Failed: ${response.error.description}`,
-        );
+        console.error("Razorpay Payment Failed:", response.error);
+        if (!alertShown) {
+          alert(
+            `Oops! Something went wrong.\nPayment Failed: ${response.error.description}`,
+          );
+          alertShown = true;
+        }
         setProcessing(false);
       });
 
       rzp.open();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error in payment flow:", error);
-      alert("Oops! Something went wrong.\nPayment Failed");
+      if (!alertShown) {
+        alert(error.message || "Oops! Something went wrong. Payment Failed");
+        alertShown = true;
+      }
     } finally {
       setProcessing(false);
     }
