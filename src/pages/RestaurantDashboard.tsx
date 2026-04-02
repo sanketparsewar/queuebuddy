@@ -57,6 +57,21 @@ const RestaurantDashboard = ({ user }: { user: User | null }) => {
   const recordsPerPage = 20;
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+
+    // Prevent back navigation by pushing a new state
+    window.history.pushState(null, "", window.location.href);
+    const handlePopState = () => {
+      window.history.pushState(null, "", window.location.href);
+    };
+    window.addEventListener("popstate", handlePopState);
+
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+    };
+  }, []);
+
+  useEffect(() => {
     if (!restaurantId) return;
     setRestaurant(null);
     setQueue([]);
@@ -840,7 +855,7 @@ const RestaurantDashboard = ({ user }: { user: User | null }) => {
                         {filteredHistory.length === 0 && (
                           <tr>
                             <td colSpan={5} className="px-6 py-16 text-center">
-                              <div className="flex flex-col items-center gap-3">
+                              <div className="flex flex-col items-center justify-center gap-3">
                                 <div className="bg-slate-50 p-4 rounded-2xl">
                                   <Calendar className="w-8 h-8 text-slate-200" />
                                 </div>
@@ -893,35 +908,35 @@ const RestaurantDashboard = ({ user }: { user: User | null }) => {
           </>
         ) : (
           <div className="max-w-4xl mx-auto">
-            <div className="bg-white rounded-[2.5rem] p-8 sm:p-12 border border-slate-100 shadow-sm">
-              <div className="flex items-center gap-4 mb-8">
-                <div className="bg-indigo-50 p-3 rounded-2xl">
-                  <CreditCard className="w-8 h-8 text-indigo-600" />
+            <div className="bg-white rounded-2xl sm:rounded-[2rem] p-4 sm:p-6 border border-slate-100 shadow-sm">
+              <div className="flex items-center gap-3 mb-4 sm:mb-6">
+                <div className="bg-indigo-50 p-2 rounded-xl shrink-0">
+                  <CreditCard className="w-5 h-5 sm:w-6 sm:h-6 text-indigo-600" />
                 </div>
                 <div>
-                  <h2 className="text-2xl font-black text-slate-900">
-                    Subscription Management
+                  <h2 className="text-base sm:text-xl font-black text-slate-900 leading-tight">
+                    Subscription
                   </h2>
-                  <p className="text-slate-500 font-medium">
-                    Manage your plan and billing details
+                  <p className="text-slate-500 font-medium text-[10px] sm:text-sm">
+                    Manage your plan and billing
                   </p>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="space-y-6">
-                  <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100">
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-6">
+                <div className="space-y-3 sm:space-y-4">
+                  <div className="bg-slate-50 p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-slate-100">
+                    <p className="text-[8px] sm:text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">
                       Current Plan
                     </p>
-                    <div className="flex items-center justify-between">
-                      <h4 className="text-xl font-black text-slate-900">
+                    <div className="flex items-center justify-between gap-2">
+                      <h4 className="text-sm sm:text-lg font-black text-slate-900 truncate">
                         {restaurant?.subscriptionPlan === "free_trial"
-                          ? "7-Day Free Trial"
+                          ? "7-Day Trial"
                           : "Monthly Premium"}
                       </h4>
                       <span
-                        className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${
+                        className={`px-2 py-0.5 rounded-full text-[7px] sm:text-[9px] font-black uppercase tracking-widest shrink-0 ${
                           restaurant?.subscriptionStatus === "active"
                             ? "bg-green-100 text-green-700"
                             : "bg-amber-100 text-amber-700"
@@ -932,15 +947,15 @@ const RestaurantDashboard = ({ user }: { user: User | null }) => {
                     </div>
                   </div>
 
-                  <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100">
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">
+                  <div className="bg-slate-50 p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-slate-100">
+                    <p className="text-[8px] sm:text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">
                       {restaurant?.subscriptionStatus === "trial"
-                        ? "Trial Ends On"
-                        : "Next Billing Date"}
+                        ? "Ends On"
+                        : "Next Billing"}
                     </p>
-                    <div className="flex items-center gap-3">
-                      <Calendar className="w-5 h-5 text-slate-400" />
-                      <h4 className="text-xl font-black text-slate-900">
+                    <div className="flex items-center gap-2">
+                      <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                      <h4 className="text-sm sm:text-lg font-black text-slate-900">
                         {restaurant?.subscriptionStatus === "trial"
                           ? new Date(
                               restaurant?.trialEndDate || "",
@@ -953,35 +968,36 @@ const RestaurantDashboard = ({ user }: { user: User | null }) => {
                   </div>
                 </div>
 
-                <div className="bg-indigo-50 p-8 rounded-[2rem] border border-indigo-100 flex flex-col justify-between">
+                <div className="bg-indigo-50 p-5 sm:p-6 rounded-xl sm:rounded-2xl border border-indigo-100 flex flex-col justify-between gap-3">
                   <div>
-                    <h4 className="text-xl font-black text-indigo-900 mb-4">
-                      Need more features?
+                    <h4 className="text-sm sm:text-lg font-black text-indigo-900 mb-1">
+                      Need more?
                     </h4>
-                    <p className="text-indigo-700/70 font-medium mb-6 leading-relaxed">
-                      Upgrade to our annual plan or contact us for enterprise
-                      solutions tailored to your business needs.
+                    <p className="text-indigo-700/70 font-medium text-[10px] sm:text-sm leading-relaxed">
+                      Upgrade for more features or contact us for enterprise
+                      solutions.
                     </p>
                   </div>
                   <button
                     onClick={() => navigate(`/subscription/${restaurantId}`)}
-                    className="w-full bg-indigo-600 text-white py-4 rounded-2xl font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200 flex items-center justify-center gap-2"
+                    className="w-full bg-indigo-600 text-white py-2.5 sm:py-3 rounded-lg sm:rounded-xl font-bold hover:bg-indigo-700 transition-all shadow-md shadow-indigo-100 flex items-center justify-center gap-2 text-xs sm:text-sm"
                   >
-                    Change Plan <ArrowRight className="w-5 h-5" />
+                    Change Plan{" "}
+                    <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   </button>
                 </div>
               </div>
 
               {restaurant?.subscriptionStatus === "trial" && (
-                <div className="mt-8 p-6 bg-amber-50 border border-amber-100 rounded-3xl flex items-start gap-4">
-                  <AlertTriangle className="w-6 h-6 text-amber-600 shrink-0" />
+                <div className="mt-4 sm:mt-6 p-3 sm:p-4 bg-amber-50 border border-amber-100 rounded-xl sm:rounded-2xl flex items-start gap-2 sm:gap-3">
+                  <AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5 text-amber-600 shrink-0 mt-0.5" />
                   <div>
-                    <h4 className="font-bold text-amber-900">
-                      Trial Period Active
+                    <h4 className="font-bold text-amber-900 text-xs sm:text-sm">
+                      Trial Active
                     </h4>
-                    <p className="text-amber-700 text-sm mt-1 font-medium">
-                      Your free trial will end soon. Upgrade to the monthly plan
-                      now to ensure uninterrupted service for your customers.
+                    <p className="text-amber-700 text-[10px] sm:text-xs mt-0.5 font-medium leading-relaxed">
+                      Your trial ends soon. Upgrade now to keep your digital
+                      queue running smoothly.
                     </p>
                   </div>
                 </div>

@@ -172,8 +172,25 @@ const Subscription = () => {
 
   if (loading) {
     return (
-      <div className="fixed inset-0 flex items-center justify-center bg-white/40 backdrop-blur-sm">
-        <Loader2 className="w-12 h-12 text-indigo-600 animate-spin" />
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-white">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="flex flex-col items-center gap-6"
+        >
+          <div className="relative">
+            <div className="w-16 h-16 border-4 border-slate-100 rounded-full"></div>
+            <div className="absolute top-0 left-0 w-16 h-16 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+          </div>
+          <div className="text-center">
+            <h3 className="text-xl font-black text-slate-900 mb-1">
+              Scan2Queue
+            </h3>
+            <p className="text-slate-500 font-medium animate-pulse">
+              Loading subscription details...
+            </p>
+          </div>
+        </motion.div>
       </div>
     );
   }

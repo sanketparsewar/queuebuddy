@@ -106,13 +106,25 @@ const Home = ({
 
   if (loading || (user && !redirectError)) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/40 backdrop-blur-sm">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
-          <p className="text-indigo-600 font-bold animate-pulse">
-            Preparing your workspace...
-          </p>
-        </div>
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-white">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="flex flex-col items-center gap-6"
+        >
+          <div className="relative">
+            <div className="w-16 h-16 border-4 border-indigo-100 rounded-full"></div>
+            <div className="absolute top-0 left-0 w-16 h-16 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+          </div>
+          <div className="text-center">
+            <h3 className="text-xl font-black text-slate-900 mb-1">
+              Scan2Queue
+            </h3>
+            <p className="text-slate-500 font-medium animate-pulse">
+              Preparing your workspace...
+            </p>
+          </div>
+        </motion.div>
       </div>
     );
   }
