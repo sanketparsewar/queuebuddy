@@ -150,6 +150,13 @@ const Subscription = () => {
         theme: {
           color: "#4f46e5",
         },
+        config: {
+          display: {
+            preferences: {
+              methods: ["upi", "card", "netbanking", "wallet"],
+            },
+          },
+        },
       };
 
       const rzp = new (window as any).Razorpay(options);
