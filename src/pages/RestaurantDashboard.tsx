@@ -12,7 +12,8 @@ import {
   deleteDoc,
   updateDoc,
 } from "firebase/firestore";
-import { db } from "../firebase";
+import { db, auth } from "../firebase";
+import { signOut } from "firebase/auth";
 import {
   QrCode,
   Users,
@@ -34,10 +35,17 @@ import { motion, AnimatePresence } from "motion/react";
 import LiveClock from "../components/LiveClock";
 import { Restaurant, QueueEntry } from "../types";
 
-const RestaurantDashboard = ({ user }: { user: User | null }) => {
+const RestaurantDashboard = ({
+  user,
+  onLogout,
+}: {
+  user: User | null;
+  onLogout?: () => void;
+}) => {
   const { restaurantId } = useParams<{ restaurantId: string }>();
   const navigate = useNavigate();
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
+  const [isSubscriptionExpired, setIsSubscriptionExpired] = useState(false);
   const [queue, setQueue] = useState<QueueEntry[]>([]);
   const [showQR, setShowQR] = useState(false);
   const [activeTab, setActiveTab] = useState<
@@ -82,19 +90,21 @@ const RestaurantDashboard = ({ user }: { user: User | null }) => {
         setRestaurant(data);
 
         // Check if subscription is expired
+        let expired = false;
         if (data.subscriptionStatus === "none" || !data.subscriptionStatus) {
-          navigate(`/subscription/${restaurantId}`, { replace: true });
+          expired = true;
         } else if (data.subscriptionStatus === "trial") {
           const trialEnd = new Date(data.trialEndDate || "");
           if (trialEnd < new Date()) {
-            navigate(`/subscription/${restaurantId}`, { replace: true });
+            expired = true;
           }
         } else if (data.subscriptionStatus === "active") {
           const expiry = new Date(data.paymentExpiryDate || "");
           if (expiry < new Date()) {
-            navigate(`/subscription/${restaurantId}`, { replace: true });
+            expired = true;
           }
         }
+        setIsSubscriptionExpired(expired);
       }
     };
     fetchRestaurant();
@@ -267,6 +277,20 @@ const RestaurantDashboard = ({ user }: { user: User | null }) => {
     setExportEndDate(yStr);
   };
 
+  const handleLogout = async () => {
+    try {
+      if (onLogout) {
+        onLogout();
+      } else {
+        localStorage.removeItem("mockUser");
+        await signOut(auth);
+        navigate("/", { replace: true });
+      }
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
+  };
+
   const baseUrl =
     (import.meta as any).env.VITE_APP_URL || window.location.origin;
   const cleanBaseUrl = baseUrl.endsWith("/") ? baseUrl.slice(0, -1) : baseUrl;
@@ -314,6 +338,44 @@ const RestaurantDashboard = ({ user }: { user: User | null }) => {
 
   return (
     <div className="min-h-screen bg-linear-to-b from-slate-50 to-white">
+      {/* Subscription Expiry Modal */}
+      <AnimatePresence>
+        {isSubscriptionExpired && (
+          <div className="fixed inset-0 z-100 flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-md">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              className="bg-white rounded-[2.5rem] p-4 max-w-md w-full shadow-2xl border border-slate-100 text-center"
+            >
+              <div className="w-20 h-20 bg-red-50 rounded-3xl flex items-center justify-center mx-auto mb-2">
+                <AlertTriangle className="w-10 h-10 text-red-500" />
+              </div>
+              <h2 className="text-xl font-black text-slate-900 mb-2">
+                Account Inactive
+              </h2>
+              <p className="text-slate-500 text-sm mb-4 leading-relaxed">
+                Your subscription has expired. Please subscribe to reactivate
+                your account and continue managing your queue.
+              </p>
+              <div className="space-y-3">
+                <button
+                  onClick={() => navigate(`/subscription/${restaurantId}`)}
+                  className="w-full bg-indigo-600 text-white py-4 rounded-2xl font-bold text-lg hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 flex items-center justify-center gap-2"
+                >
+                  <CreditCard className="w-5 h-5" /> Subscribe Now
+                </button>
+                <button
+                  onClick={handleLogout}
+                  className="w-full bg-slate-100 text-slate-600 py-4 rounded-2xl font-bold text-lg hover:bg-slate-200 transition-all"
+                >
+                  Logout
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
       <div className="w-full pt-6 sm:pt-10 px-4 sm:px-6 lg:px-8 xl:px-16 2xl:px-24 pb-24">
         {/* Export Modal */}
         <AnimatePresence>

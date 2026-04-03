@@ -40,7 +40,6 @@ import RestaurantDashboard from "./pages/RestaurantDashboard";
 import CustomerJoin from "./pages/CustomerJoin";
 import Subscription from "./pages/Subscription";
 import { FaFacebook, FaInstagram, FaLinkedin } from "react-icons/fa";
-import { IconType } from "react-icons/lib";
 
 const Home = ({
   user,
@@ -52,7 +51,7 @@ const Home = ({
   const [loading, setLoading] = useState(true);
   const [redirectError, setRedirectError] = useState(false);
   const navigate = useNavigate();
-  const socialIcons: IconType[] = [FaInstagram, FaLinkedin, FaFacebook];
+  const socialIcons = [FaInstagram, FaLinkedin, FaFacebook] as any[];
 
   const isDev =
     (import.meta as any).env.DEV ||
@@ -640,7 +639,7 @@ const AppContent = ({
           path="/dashboard/:restaurantId"
           element={
             user ? (
-              <RestaurantDashboard user={user} />
+              <RestaurantDashboard user={user} onLogout={handleLogout} />
             ) : (
               <Navigate to="/" replace />
             )
