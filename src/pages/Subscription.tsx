@@ -20,6 +20,10 @@ const Subscription = () => {
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState(false);
 
+  const isTrialActive = restaurant?.subscriptionStatus === "trial";
+  const isMonthlyActive = restaurant?.subscriptionStatus === "active";
+  const hasUsedTrial = restaurant?.hasUsedTrial === true;
+
   useEffect(() => {
     if (!restaurantId) return;
     const fetchRestaurant = async () => {
@@ -59,6 +63,7 @@ const Subscription = () => {
         subscriptionStatus: "trial",
         subscriptionPlan: "free_trial",
         trialEndDate: trialEndDate.toISOString(),
+        hasUsedTrial: true,
       });
 
       navigate(`/dashboard/${restaurantId}`, { replace: true });
@@ -272,11 +277,23 @@ const Subscription = () => {
 
             <button
               onClick={handleTrial}
-              disabled={processing}
-              className="w-full py-4 rounded-2xl font-bold text-lg transition-all border-2 border-slate-100 text-slate-700 hover:border-indigo-600 hover:text-indigo-600 flex items-center justify-center gap-2 group"
+              disabled={
+                processing || isTrialActive || isMonthlyActive || hasUsedTrial
+              }
+              className={`w-full py-4 rounded-2xl font-bold text-lg transition-all border-2 flex items-center justify-center gap-2 group ${
+                isTrialActive || isMonthlyActive || hasUsedTrial
+                  ? "bg-slate-50 border-slate-100 text-slate-400 cursor-not-allowed"
+                  : "border-slate-100 text-slate-700 hover:border-indigo-600 hover:text-indigo-600"
+              }`}
             >
               {processing ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
+              ) : isTrialActive ? (
+                "Current Plan (Trial)"
+              ) : hasUsedTrial ? (
+                "Trial Already Used"
+              ) : isMonthlyActive ? (
+                "Trial Unavailable"
               ) : (
                 <>
                   Start 7-Day Trial{" "}
@@ -284,6 +301,16 @@ const Subscription = () => {
                 </>
               )}
             </button>
+            {isTrialActive && (
+              <p className="text-center mt-3 text-amber-600 text-sm font-bold">
+                Your 7-day free trial is currently active.
+              </p>
+            )}
+            {hasUsedTrial && !isTrialActive && (
+              <p className="text-center mt-3 text-slate-400 text-sm font-medium">
+                You have already used your one-time free trial.
+              </p>
+            )}
           </motion.div>
 
           {/* Premium Plan */}
@@ -339,17 +366,28 @@ const Subscription = () => {
 
             <button
               onClick={handlePayment}
-              disabled={processing}
-              className="w-full bg-white text-indigo-600 py-4 rounded-2xl font-bold text-lg hover:bg-indigo-50 transition-all shadow-xl flex items-center justify-center gap-2 group relative z-10"
+              disabled={processing || isMonthlyActive}
+              className={`w-full py-4 rounded-2xl font-bold text-lg transition-all shadow-xl flex items-center justify-center gap-2 group relative z-10 ${
+                isMonthlyActive
+                  ? "bg-indigo-400 text-indigo-100 cursor-not-allowed shadow-none"
+                  : "bg-white text-indigo-600 hover:bg-indigo-50"
+              }`}
             >
               {processing ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
+              ) : isMonthlyActive ? (
+                "Monthly Plan Active"
               ) : (
                 <>
                   <CreditCard className="w-5 h-5" /> Pay ₹199 Now
                 </>
               )}
             </button>
+            {isMonthlyActive && (
+              <p className="text-center mt-3 text-indigo-100 text-sm font-bold relative z-10">
+                Your monthly premium plan is currently active.
+              </p>
+            )}
           </motion.div>
         </div>
 

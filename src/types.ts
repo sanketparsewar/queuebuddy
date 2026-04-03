@@ -41,6 +41,7 @@ export interface Restaurant {
   subscriptionPlan?: "free_trial" | "monthly_199";
   trialEndDate?: string; // ISO string
   paymentExpiryDate?: string; // ISO string
+  hasUsedTrial?: boolean;
 }
 
 export interface QueueEntry {
