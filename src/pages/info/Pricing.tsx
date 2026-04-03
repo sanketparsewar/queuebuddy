@@ -1,6 +1,7 @@
 import React from "react";
 import { motion } from "motion/react";
 import { CheckCircle2, Zap, Users, BarChart3 } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Pricing = () => {
   const plans = [
@@ -8,12 +9,14 @@ const Pricing = () => {
       name: "Free Trial",
       price: "0",
       duration: "7 Days",
-      description: "Experience the full power of Scan2Queue with no commitment.",
+      description:
+        "Experience the full power of Scan2Queue with no commitment.",
       features: [
-        "Unlimited Queue Entries",
-        "Real-time Dashboard",
+        "Full Queue Management",
         "QR Code Generation",
+        "Real-time Updates",
         "Basic Analytics",
+        "7 Days Access",
       ],
       buttonText: "Start Free Trial",
       highlight: false,
@@ -24,12 +27,11 @@ const Pricing = () => {
       duration: "Per Month",
       description: "Everything you need to manage your restaurant's waitlist.",
       features: [
+        "Everything in Trial",
         "Unlimited Queue Entries",
-        "Real-time Dashboard",
-        "QR Code Generation",
-        "Advanced Analytics",
-        "Priority Support",
+        "Advanced Export (CSV)",
         "Custom Branding",
+        "30 Days Access",
       ],
       buttonText: "Get Started Now",
       highlight: true,
@@ -37,7 +39,7 @@ const Pricing = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-white pt-24 pb-12">
+    <div className="min-h-screen bg-white pt-4 pb-12">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -66,17 +68,23 @@ const Pricing = () => {
               }`}
             >
               <div className="mb-8">
-                <h3 className={`text-2xl font-black mb-2 ${plan.highlight ? "text-white" : "text-gray-900"}`}>
+                <h3
+                  className={`text-2xl font-black mb-2 ${plan.highlight ? "text-white" : "text-gray-900"}`}
+                >
                   {plan.name}
                 </h3>
-                <p className={`text-sm font-medium ${plan.highlight ? "text-indigo-100" : "text-gray-500"}`}>
+                <p
+                  className={`text-sm font-medium ${plan.highlight ? "text-indigo-100" : "text-gray-500"}`}
+                >
                   {plan.description}
                 </p>
               </div>
-              
+
               <div className="mb-8 flex items-baseline gap-1">
                 <span className="text-5xl font-black">₹{plan.price}</span>
-                <span className={`text-sm font-bold uppercase tracking-widest ${plan.highlight ? "text-indigo-200" : "text-gray-400"}`}>
+                <span
+                  className={`text-sm font-bold uppercase tracking-widest ${plan.highlight ? "text-indigo-200" : "text-gray-400"}`}
+                >
                   / {plan.duration}
                 </span>
               </div>
@@ -84,21 +92,24 @@ const Pricing = () => {
               <div className="space-y-4 mb-10 flex-1">
                 {plan.features.map((feature, i) => (
                   <div key={i} className="flex items-center gap-3">
-                    <CheckCircle2 className={`w-5 h-5 ${plan.highlight ? "text-indigo-300" : "text-green-500"}`} />
+                    <CheckCircle2
+                      className={`w-5 h-5 ${plan.highlight ? "text-indigo-300" : "text-green-500"}`}
+                    />
                     <span className="font-medium">{feature}</span>
                   </div>
                 ))}
               </div>
-
-              <button
-                className={`w-full py-4 rounded-2xl font-bold text-lg transition-all ${
-                  plan.highlight
-                    ? "bg-white text-indigo-600 hover:bg-indigo-50 shadow-lg shadow-indigo-900/20"
-                    : "bg-indigo-600 text-white hover:bg-indigo-700 shadow-lg shadow-indigo-100"
-                }`}
-              >
-                {plan.buttonText}
-              </button>
+              <Link to="/">
+                <button
+                  className={`w-full py-4 rounded-2xl font-bold text-lg transition-all ${
+                    plan.highlight
+                      ? "bg-white text-indigo-600 hover:bg-indigo-50 shadow-lg shadow-indigo-900/20"
+                      : "bg-indigo-600 text-white hover:bg-indigo-700 shadow-lg shadow-indigo-100"
+                  }`}
+                >
+                  {plan.buttonText}
+                </button>
+              </Link>
             </motion.div>
           ))}
         </div>

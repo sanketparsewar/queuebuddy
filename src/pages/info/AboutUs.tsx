@@ -4,7 +4,7 @@ import { Heart, Users, Zap, Clock } from "lucide-react";
 
 const AboutUs = () => {
   return (
-    <div className="min-h-screen bg-white pt-24 pb-12">
+    <div className="min-h-screen bg-white pt-4 pb-12">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -54,7 +54,7 @@ const AboutUs = () => {
           </motion.div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-24">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
           {[
             {
               icon: <Heart className="w-8 h-8 text-red-500" />,

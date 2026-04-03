@@ -261,7 +261,7 @@ const Home = ({
                       Restaurant Dashboard
                     </div>
                   </div>
-                  <div className="p-6 space-y-4">
+                  <div className="p-6 space-y-2">
                     <div className="flex justify-between items-center mb-6">
                       <div className="h-8 w-32 bg-gray-100 rounded-lg"></div>
                       <div className="h-10 w-10 bg-indigo-600 rounded-full"></div>
@@ -432,7 +432,7 @@ const Home = ({
                   gives you the tools to automate your front-of-house and keep
                   guests happy.
                 </p>
-                <ul className="space-y-4">
+                <ul className="space-y-2">
                   {benefits.map((benefit, index) => (
                     <li key={index} className="flex items-center gap-3">
                       <div className="bg-indigo-500/30 p-1 rounded-full">
@@ -499,9 +499,9 @@ const Footer = () => {
   const socialIcons = [FaInstagram, FaLinkedin, FaFacebook] as any[];
 
   return (
-    <footer className="bg-gray-50 pt-24 pb-12 mt-auto border-t border-gray-200">
+    <footer className="bg-gray-50 pt-12 pb-8 mt-auto border-t border-gray-200">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-8">
           <div className="col-span-1 md:col-span-2">
             <div className="flex items-center gap-2 mb-6">
               <Link to="/" className="flex items-center gap-2">
@@ -531,8 +531,8 @@ const Footer = () => {
             </div>
           </div>
           <div>
-            <h4 className="font-bold text-gray-900 mb-6">Product</h4>
-            <ul className="space-y-4 text-gray-500 font-medium">
+            <h4 className="font-bold text-gray-900 mb-6">Feature</h4>
+            <ul className="space-y-2 text-gray-500 font-medium">
               <li>
                 <Link
                   to="/"
@@ -556,7 +556,7 @@ const Footer = () => {
           </div>
           <div>
             <h4 className="font-bold text-gray-900 mb-6">Company</h4>
-            <ul className="space-y-4 text-gray-500 font-medium">
+            <ul className="space-y-2 text-gray-500 font-medium">
               <li>
                 <Link
                   to="/about"
@@ -592,7 +592,7 @@ const Footer = () => {
             </ul>
           </div>
         </div>
-        <div className="pt-12 border-t border-gray-200 flex flex-col sm:flex-row justify-between items-center gap-6">
+        <div className="pt-8 border-t border-gray-200 flex flex-col sm:flex-row justify-between items-center gap-4">
           <p className="text-gray-400 font-medium text-sm">
             © 2026 Daxabit. All rights reserved.
           </p>

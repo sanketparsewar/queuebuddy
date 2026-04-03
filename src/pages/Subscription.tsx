@@ -98,7 +98,7 @@ const Subscription = () => {
       const orderResponse = await fetch(`${appUrl}/api/razorpay/order`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ amount: 100, currency: "INR" }),
+        body: JSON.stringify({ amount: 19900, currency: "INR" }),
       });
 
       if (!orderResponse.ok) throw new Error("Failed to create order");
@@ -349,7 +349,6 @@ const Subscription = () => {
                 {[
                   "Everything in Trial",
                   "Unlimited Queue Entries",
-                  "Priority Support",
                   "Advanced Export (CSV)",
                   "Custom Branding",
                   "30 Days Access",

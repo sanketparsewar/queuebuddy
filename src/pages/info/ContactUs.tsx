@@ -4,7 +4,7 @@ import { Mail, Phone, MapPin, Send } from "lucide-react";
 
 const ContactUs = () => {
   return (
-    <div className="min-h-screen bg-white pt-24 pb-12">
+    <div className="min-h-screen bg-white pt-4 pb-12">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -19,7 +19,7 @@ const ContactUs = () => {
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <motion.div
             initial={{ opacity: 0, x: -30 }}
             animate={{ opacity: 1, x: 0 }}
@@ -30,10 +30,10 @@ const ContactUs = () => {
                 <Mail className="w-8 h-8 text-indigo-600" />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">
+                <h3 className="text-lg font-bold text-gray-900 mb-2">
                   Email Us
                 </h3>
-                <p className="text-gray-600 text-lg">support@scan2queue.com</p>
+                <p className="text-gray-600 text-sm">support@scan2queue.com</p>
                 <p className="text-gray-400 text-sm mt-1">
                   We respond within 24 hours.
                 </p>
@@ -45,10 +45,10 @@ const ContactUs = () => {
                 <Phone className="w-8 h-8 text-indigo-600" />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">
+                <h3 className="text-lg font-bold text-gray-900 mb-2">
                   Call Us
                 </h3>
-                <p className="text-gray-600 text-lg">+1 (555) 123-4567</p>
+                <p className="text-gray-600 text-sm">+91 88303 92209</p>
                 <p className="text-gray-400 text-sm mt-1">
                   Mon-Fri, 9am - 6pm EST.
                 </p>
@@ -60,13 +60,13 @@ const ContactUs = () => {
                 <MapPin className="w-8 h-8 text-indigo-600" />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">
+                <h3 className="text-lg font-bold text-gray-900 mb-2">
                   Our Office
                 </h3>
-                <p className="text-gray-600 text-lg">
+                <p className="text-gray-600 text-sm">
                   123 Tech Lane, Suite 456
                 </p>
-                <p className="text-gray-600 text-lg">San Francisco, CA 94103</p>
+                <p className="text-gray-600 text-sm">Maharashtra, IN 431601</p>
               </div>
             </div>
           </motion.div>
@@ -85,7 +85,7 @@ const ContactUs = () => {
                   <input
                     type="text"
                     className="w-full px-6 py-4 bg-white border border-gray-100 rounded-2xl text-gray-900 font-bold focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
-                    placeholder="John Doe"
+                    placeholder="Enter your name"
                   />
                 </div>
                 <div>
@@ -95,7 +95,7 @@ const ContactUs = () => {
                   <input
                     type="email"
                     className="w-full px-6 py-4 bg-white border border-gray-100 rounded-2xl text-gray-900 font-bold focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
-                    placeholder="john@example.com"
+                    placeholder="abc@example.com"
                   />
                 </div>
               </div>
