@@ -96,7 +96,7 @@ const RestaurantRegistration = ({ user }: { user: User | null }) => {
             Register Your Restaurant
           </h2>
           <p className="text-sm sm:text-base text-gray-500 mt-2">
-            Start managing your virtual queue today.
+            Create your QR and start managing customers in under 2 minutes.
           </p>
         </div>
         <form onSubmit={handleSubmit} className="space-y-6">

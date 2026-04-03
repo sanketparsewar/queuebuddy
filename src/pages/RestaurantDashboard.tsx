@@ -605,7 +605,7 @@ const RestaurantDashboard = ({
               >
                 <div className="bg-white p-8 sm:p-12 rounded-[3rem] border border-indigo-100 shadow-xl shadow-indigo-100/20 flex flex-col items-center text-center max-w-2xl mx-auto">
                   <div className="bg-indigo-50 text-indigo-600 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest mb-8">
-                    Customer Registration Point
+                    Print this QR and place it at your entrance.
                   </div>
 
                   <div className="bg-white p-4 sm:p-6 rounded-2xl shadow-lg border border-slate-50 mb-8">

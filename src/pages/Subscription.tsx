@@ -223,7 +223,7 @@ const Subscription = () => {
             animate={{ opacity: 1, y: 0 }}
           >
             <h1 className="text-4xl font-black text-slate-900 tracking-tight mb-4">
-              Choose your plan
+              Start your queue system today
             </h1>
             <p className="text-lg text-slate-500 font-medium max-w-2xl mx-auto">
               Select the best plan for your restaurant. Start with a free trial
@@ -305,6 +305,11 @@ const Subscription = () => {
                 </>
               )}
             </button>
+            {!isTrialActive && !hasUsedTrial && (
+              <p className="text-center text-sm text-red-500 mt-3 font-bold">
+                Limited free trial • No credit card required
+              </p>
+            )}
             {isTrialActive && (
               <p className="text-center mt-3 text-amber-600 text-sm font-bold">
                 Your 7-day free trial is currently active.
@@ -337,7 +342,7 @@ const Subscription = () => {
                 </span>
               </div>
               <p className="text-indigo-100 font-medium">
-                Unlimited access for your business.
+                Serve more customers & reduce crowd instantly
               </p>
             </div>
 
