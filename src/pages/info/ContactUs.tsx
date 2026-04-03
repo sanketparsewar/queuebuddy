@@ -64,7 +64,7 @@ const ContactUs = () => {
                   Our Office
                 </h3>
                 <p className="text-gray-600 text-sm">
-                  123 Tech Lane, Suite 456
+                  Pune
                 </p>
                 <p className="text-gray-600 text-sm">Maharashtra, IN 431601</p>
               </div>
