@@ -6,6 +6,7 @@ import {
   useNavigate,
   Navigate,
   useLocation,
+  Link,
 } from "react-router-dom";
 import { collection, query, where, getDocs, limit } from "firebase/firestore";
 import {
@@ -39,7 +40,22 @@ import RestaurantRegistration from "./pages/RestaurantRegistration";
 import RestaurantDashboard from "./pages/RestaurantDashboard";
 import CustomerJoin from "./pages/CustomerJoin";
 import Subscription from "./pages/Subscription";
+import Pricing from "./pages/info/Pricing";
+import AboutUs from "./pages/info/AboutUs";
+import ContactUs from "./pages/info/ContactUs";
+import PrivacyPolicy from "./pages/info/PrivacyPolicy";
+import TermsOfService from "./pages/info/TermsOfService";
 import { FaFacebook, FaInstagram, FaLinkedin } from "react-icons/fa";
+
+const ScrollToTop = () => {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
+  return null;
+};
 
 const Home = ({
   user,
@@ -472,133 +488,126 @@ const Home = ({
             </div>
           </div>
         </div>
-
-        {/* Unique Footer */}
-        <footer className="bg-gray-50 pt-24 pb-12 mt-auto border-t border-gray-200">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
-              <div className="col-span-1 md:col-span-2">
-                <div className="flex items-center gap-2 mb-6">
-                  <div className="bg-indigo-600 p-2 rounded-lg">
-                    <Clock className="text-white w-5 h-5" />
-                  </div>
-                  <span className="text-2xl font-black tracking-tighter text-gray-900">
-                    Scan2Queue
-                  </span>
-                </div>
-                <p className="text-gray-500 max-w-sm mb-8 leading-relaxed">
-                  Empowering restaurants with modern queue management solutions.
-                  Built for speed, reliability, and customer satisfaction.
-                </p>
-                <div className="flex gap-4">
-                  {socialIcons.map((Icon, i) => (
-                    <motion.a
-                      key={i}
-                      href="#"
-                      whileHover={{ y: -3, scale: 1.1 }}
-                      className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-gray-400 hover:text-indigo-600 hover:shadow-lg transition-all border border-gray-100"
-                    >
-                      <Icon className="w-5 h-5" />
-                    </motion.a>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <h4 className="font-bold text-gray-900 mb-6">Product</h4>
-                <ul className="space-y-4 text-gray-500 font-medium">
-                  <li>
-                    <a
-                      href="#"
-                      className="hover:text-indigo-600 transition-colors"
-                    >
-                      Features
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="hover:text-indigo-600 transition-colors"
-                    >
-                      Pricing
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="hover:text-indigo-600 transition-colors"
-                    >
-                      Business API
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="hover:text-indigo-600 transition-colors"
-                    >
-                      Integrations
-                    </a>
-                  </li>
-                </ul>
-              </div>
-              <div>
-                <h4 className="font-bold text-gray-900 mb-6">Company</h4>
-                <ul className="space-y-4 text-gray-500 font-medium">
-                  <li>
-                    <a
-                      href="#"
-                      className="hover:text-indigo-600 transition-colors"
-                    >
-                      About Us
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="hover:text-indigo-600 transition-colors"
-                    >
-                      Careers
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="hover:text-indigo-600 transition-colors"
-                    >
-                      Privacy Policy
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="hover:text-indigo-600 transition-colors"
-                    >
-                      Terms of Service
-                    </a>
-                  </li>
-                </ul>
-              </div>
-            </div>
-            <div className="pt-12 border-t border-gray-200 flex flex-col sm:flex-row justify-between items-center gap-6">
-              <p className="text-gray-400 font-medium text-sm">
-                © 2026 Daxabit. All rights reserved.
-              </p>
-              <motion.div
-                animate={{ scale: [1, 1.1, 1] }}
-                transition={{ duration: 2, repeat: Infinity }}
-                className="flex items-center gap-2 text-gray-400 font-medium text-sm"
-              >
-                Made with{" "}
-                <Heart className="w-4 h-4 text-red-400 fill-red-400" /> for
-                restaurants
-              </motion.div>
-            </div>
-          </div>
-        </footer>
       </div>
     );
   }
 
   return null;
+};
+
+const Footer = () => {
+  const socialIcons = [FaInstagram, FaLinkedin, FaFacebook] as any[];
+
+  return (
+    <footer className="bg-gray-50 pt-24 pb-12 mt-auto border-t border-gray-200">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
+          <div className="col-span-1 md:col-span-2">
+            <div className="flex items-center gap-2 mb-6">
+              <Link to="/" className="flex items-center gap-2">
+                <div className="bg-indigo-600 p-2 rounded-lg">
+                  <Clock className="text-white w-5 h-5" />
+                </div>
+                <span className="text-2xl font-black tracking-tighter text-gray-900">
+                  Scan2Queue
+                </span>
+              </Link>
+            </div>
+            <p className="text-gray-500 max-w-sm mb-8 leading-relaxed">
+              Empowering restaurants with modern queue management solutions.
+              Built for speed, reliability, and customer satisfaction.
+            </p>
+            <div className="flex gap-4">
+              {socialIcons.map((Icon, i) => (
+                <motion.a
+                  key={i}
+                  href="#"
+                  whileHover={{ y: -3, scale: 1.1 }}
+                  className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-gray-400 hover:text-indigo-600 hover:shadow-lg transition-all border border-gray-100"
+                >
+                  <Icon className="w-5 h-5" />
+                </motion.a>
+              ))}
+            </div>
+          </div>
+          <div>
+            <h4 className="font-bold text-gray-900 mb-6">Product</h4>
+            <ul className="space-y-4 text-gray-500 font-medium">
+              <li>
+                <Link
+                  to="/"
+                  onClick={() =>
+                    window.scrollTo({ top: 0, behavior: "smooth" })
+                  }
+                  className="hover:text-indigo-600 transition-colors"
+                >
+                  Home
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/pricing"
+                  className="hover:text-indigo-600 transition-colors"
+                >
+                  Pricing
+                </Link>
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h4 className="font-bold text-gray-900 mb-6">Company</h4>
+            <ul className="space-y-4 text-gray-500 font-medium">
+              <li>
+                <Link
+                  to="/about"
+                  className="hover:text-indigo-600 transition-colors"
+                >
+                  About Us
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/contact"
+                  className="hover:text-indigo-600 transition-colors"
+                >
+                  Contact Us
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/privacy"
+                  className="hover:text-indigo-600 transition-colors"
+                >
+                  Privacy Policy
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/terms"
+                  className="hover:text-indigo-600 transition-colors"
+                >
+                  Terms of Service
+                </Link>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div className="pt-12 border-t border-gray-200 flex flex-col sm:flex-row justify-between items-center gap-6">
+          <p className="text-gray-400 font-medium text-sm">
+            © 2026 Daxabit. All rights reserved.
+          </p>
+          <motion.div
+            animate={{ scale: [1, 1.1, 1] }}
+            transition={{ duration: 2, repeat: Infinity }}
+            className="flex items-center gap-2 text-gray-400 font-medium text-sm"
+          >
+            Made with <Heart className="w-4 h-4 text-red-400 fill-red-400" />{" "}
+            for restaurants
+          </motion.div>
+        </div>
+      </div>
+    </footer>
+  );
 };
 
 const AppContent = ({
@@ -615,6 +624,7 @@ const AppContent = ({
 
   return (
     <div className="min-h-screen bg-gray-50 font-sans selection:bg-indigo-100 selection:text-indigo-900">
+      <ScrollToTop />
       {!isJoinPage && <Navbar user={user} onLogout={handleLogout} />}
       <Routes>
         <Route
@@ -646,8 +656,14 @@ const AppContent = ({
           }
         />
         <Route path="/join" element={<CustomerJoin />} />
+        <Route path="/pricing" element={<Pricing />} />
+        <Route path="/about" element={<AboutUs />} />
+        <Route path="/contact" element={<ContactUs />} />
+        <Route path="/privacy" element={<PrivacyPolicy />} />
+        <Route path="/terms" element={<TermsOfService />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+      {!isJoinPage && <Footer />}
     </div>
   );
 };
