@@ -526,7 +526,7 @@ const RestaurantDashboard = ({
         {activeTab === "queue" ? (
           <>
             {/* Stats Overview */}
-            <div className="grid grid-cols-4 md:grid-cols-4 gap-3 sm:gap-6 mb-2 sm:mb-2">
+            <div className="grid grid-cols-4 md:grid-cols-4 gap-2 sm:gap-6 mb-2 sm:mb-2">
               {[
                 {
                   label: "Total",
@@ -596,84 +596,74 @@ const RestaurantDashboard = ({
               ))}
             </div>
 
-            {showQR && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95, y: -20 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95, y: -20 }}
-                className="mb-12"
-              >
-                <div className="bg-white p-8 sm:p-12 rounded-[3rem] border border-indigo-100 shadow-xl shadow-indigo-100/20 flex flex-col items-center text-center max-w-2xl mx-auto">
-                  <div className="bg-indigo-50 text-indigo-600 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest mb-8">
-                    Print this QR and place it at your entrance.
-                  </div>
+            {/* QR Modal */}
+            <AnimatePresence>
+              {showQR && (
+                <div className="fixed inset-0 z-70 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                    className="bg-white w-full max-w-lg rounded-2xl p-6 sm:p-8 shadow-2xl relative"
+                  >
+                    {/* CLOSE BUTTON */}
+                    <button
+                      onClick={() => setShowQR(false)}
+                      className="absolute top-4 right-4   hover:bg-gray-100 rounded-full"
+                    >
+                      <X className="w-5 h-5 text-gray-500" />
+                    </button>
 
-                  <div className="bg-white p-4 sm:p-6 rounded-2xl shadow-lg border border-slate-50 mb-8">
-                    <QRCodeSVG
-                      id="qr-code-svg"
-                      value={joinUrl}
-                      size={window.innerWidth < 640 ? 180 : 240}
-                    />
-                  </div>
-
-                  {/* URL Warning */}
-                  {baseUrl.includes("ais-dev-") && (
-                    <div className="mb-6 p-4 bg-amber-50 border border-amber-100 rounded-xl text-amber-700 text-xs sm:text-sm font-medium max-w-md">
-                      <div className="flex items-start gap-3">
-                        <div className="bg-amber-100 p-1 rounded mt-0.5">
-                          <Users className="w-4 h-4 text-amber-600" />
-                        </div>
-                        <div className="text-left">
-                          <p className="font-bold">Private Dev URL Detected</p>
-                          <p className="mt-1 opacity-80 leading-relaxed">
-                            To test on other devices, please use the{" "}
-                            <strong>Shared App URL</strong> from AI Studio. The
-                            current URL is restricted to your session.
-                          </p>
-                        </div>
+                    {/* CONTENT */}
+                    <div className="flex flex-col items-center text-center">
+                      <div className="bg-indigo-50 text-indigo-600 px-4 py-1.5 rounded-xl mt-2 text-xs font-black uppercase tracking-widest">
+                        Print and place it at your entrance
                       </div>
-                    </div>
-                  )}
 
-                  <div className="flex flex-col sm:flex-row gap-3 mb-6 w-full sm:w-auto">
-                    <button
-                      onClick={downloadQRCode}
-                      className="flex items-center justify-center gap-2 bg-indigo-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200 group active:scale-95"
-                    >
-                      <Download className="w-4 h-4 group-hover:-translate-y-0.5 transition-transform" />{" "}
-                      Download QR
-                    </button>
-                    <button
-                      onClick={copyToClipboard}
-                      className={`flex items-center justify-center gap-2 px-8 py-3 rounded-xl font-bold transition-all shadow-sm border ${
-                        copySuccess
-                          ? "bg-green-50 border-green-200 text-green-600"
-                          : "bg-white border-slate-200 text-slate-700 hover:border-indigo-200 hover:text-indigo-600"
-                      }`}
-                    >
-                      {copySuccess ? (
-                        <>
-                          <CheckCircle2 className="w-4 h-4" /> Copied!
-                        </>
-                      ) : (
-                        <>
-                          <QrCode className="w-4 h-4" /> Copy Link
-                        </>
-                      )}
-                    </button>
-                  </div>
-                  <p className="text-slate-500 font-medium max-w-md leading-relaxed mb-4 text-sm">
-                    Display this QR code at your reception. Customers scan it to
-                    join your digital queue instantly.
-                  </p>
-                  <div className="bg-slate-50 px-6 py-3 rounded-xl border border-slate-100 w-full max-w-md">
-                    <code className="text-indigo-600 text-xs font-bold break-all">
-                      {joinUrl}
-                    </code>
-                  </div>
+                      <div className="bg-white p-4 sm:p-6 rounded-2xl shadow-lg border border-slate-50 mb-6 mt-6">
+                        <QRCodeSVG
+                          id="qr-code-svg"
+                          value={joinUrl}
+                          size={window.innerWidth < 640 ? 180 : 240}
+                        />
+                      </div>
+
+                      <div className="flex flex-col sm:flex-row justify-center items-center gap-3 mb-4 w-full">
+                        <button
+                          onClick={downloadQRCode}
+                          className="w-full sm:w-auto flex items-center justify-center gap-2 bg-indigo-600 text-white sm:px-6 sm:py-3 px-3 py-2 rounded-xl font-bold hover:bg-indigo-700 transition-all"
+                        >
+                          <Download className="w-4 h-4" /> Download
+                        </button>
+
+                        <button
+                          onClick={copyToClipboard}
+                          className={`w-full sm:w-auto flex items-center justify-center gap-2 sm:px-6 sm:py-3 px-3 py-2 rounded-xl font-bold transition-all border ${
+                            copySuccess
+                              ? "bg-green-50 border-green-200 text-green-600"
+                              : "bg-white border-slate-200 text-slate-700 hover:border-indigo-200 hover:text-indigo-600"
+                          }`}
+                        >
+                          {copySuccess ? (
+                            <>
+                              <CheckCircle2 className="w-4 h-4" /> Copied
+                            </>
+                          ) : (
+                            <>
+                              <QrCode className="w-4 h-4" /> Copy Link
+                            </>
+                          )}
+                        </button>
+                      </div>
+
+                      <p className="text-slate-500 text-sm">
+                        Customers scan it to join your digital queue instantly
+                      </p>
+                    </div>
+                  </motion.div>
                 </div>
-              </motion.div>
-            )}
+              )}
+            </AnimatePresence>
 
             <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
               {/* Current Queue Section */}
