@@ -25,6 +25,7 @@ const CustomerJoin = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [sessionTrigger, setSessionTrigger] = useState(0);
+  const [isInitialCheckDone, setIsInitialCheckDone] = useState(false);
 
   // Restore session from localStorage
   useEffect(() => {
@@ -43,9 +44,11 @@ const CustomerJoin = () => {
             localStorage.removeItem(`queue_entry_${restaurantId}`);
             setToken(null);
           }
+          setIsInitialCheckDone(true);
         },
         (error) => {
           console.error("onSnapshot error:", error);
+          setIsInitialCheckDone(true);
           handleFirestoreError(
             error,
             OperationType.GET,
@@ -54,6 +57,8 @@ const CustomerJoin = () => {
         },
       );
       return () => unsubscribe();
+    } else {
+      setIsInitialCheckDone(true);
     }
   }, [restaurantId, sessionTrigger]);
 
@@ -189,6 +194,14 @@ const CustomerJoin = () => {
             Please scan a valid restaurant QR code.
           </p>
         </div>
+      </div>
+    );
+  }
+
+  if (!isInitialCheckDone) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="w-10 h-10 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }
