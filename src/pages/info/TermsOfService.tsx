@@ -1,6 +1,7 @@
 import React from "react";
 import { motion } from "motion/react";
 import { FileText, Shield, Zap, Clock } from "lucide-react";
+import { BRANDNAME } from "@/src/utils/constants";
 
 const TermsOfService = () => {
   return (
@@ -52,7 +53,7 @@ const TermsOfService = () => {
             </h2>
             <p className="text-gray-600 text-sm leading-relaxed">
               The service and its original content, features, and functionality
-              are and will remain the exclusive property of Scan2Queue and its
+              are and will remain the exclusive property of {BRANDNAME} and its
               licensors.
             </p>
           </section>

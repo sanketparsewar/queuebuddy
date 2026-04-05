@@ -46,6 +46,7 @@ import ContactUs from "./pages/info/ContactUs";
 import PrivacyPolicy from "./pages/info/PrivacyPolicy";
 import TermsOfService from "./pages/info/TermsOfService";
 import { FaFacebook, FaInstagram, FaLinkedin } from "react-icons/fa";
+import { BRANDNAME } from "./utils/constants";
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
@@ -133,7 +134,7 @@ const Home = ({
           </div>
           <div className="text-center">
             <h3 className="text-xl font-black text-slate-900 mb-1">
-              Scan2Queue
+              {BRANDNAME}
             </h3>
             <p className="text-slate-500 font-medium animate-pulse">
               Preparing your workspace...
@@ -511,7 +512,7 @@ const Footer = () => {
                   <Clock className="text-white w-5 h-5" />
                 </div>
                 <span className="text-2xl font-black tracking-tighter text-gray-900">
-                  Scan2Queue
+                  {BRANDNAME}
                 </span>
               </Link>
             </div>

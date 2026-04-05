@@ -2,15 +2,15 @@ import React from "react";
 import { motion } from "motion/react";
 import { CheckCircle2, Zap, Users, BarChart3 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { BRANDNAME } from "@/src/utils/constants";
 
 const Pricing = () => {
   const plans = [
     {
       name: "Free Trial",
       price: "0",
-      duration: "7 Days",
-      description:
-        "Experience the full power of Scan2Queue with no commitment.",
+      duration: "14 Days",
+      description: `Experience the full power of ${BRANDNAME} with no commitment.`,
       features: [
         "Full Queue Management",
         "QR Code Generation",

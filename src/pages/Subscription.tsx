@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { motion } from "motion/react";
 import { Restaurant } from "../types";
+import { BRANDNAME } from "../utils/constants";
 
 const Subscription = () => {
   const { restaurantId } = useParams<{ restaurantId: string }>();
@@ -57,7 +58,7 @@ const Subscription = () => {
     setProcessing(true);
     try {
       const trialEndDate = new Date();
-      trialEndDate.setDate(trialEndDate.getDate() + 7);
+      trialEndDate.setDate(trialEndDate.getDate() + 14);
 
       await updateDoc(doc(db, "restaurants", restaurantId), {
         subscriptionStatus: "trial",
@@ -109,7 +110,7 @@ const Subscription = () => {
         key: razorpayKey,
         amount: order.amount,
         currency: order.currency,
-        name: "Scan2Queue",
+        name: BRANDNAME,
         description: `Subscription for ${restaurant.name}`,
         image: "/favicon.svg",
         order_id: order.id,
@@ -216,7 +217,7 @@ const Subscription = () => {
           </div>
           <div className="text-center">
             <h3 className="text-xl font-black text-slate-900 mb-1">
-              Scan2Queue
+              {BRANDNAME}
             </h3>
             <p className="text-slate-500 font-medium animate-pulse">
               Loading subscription details...
@@ -267,7 +268,7 @@ const Subscription = () => {
             <div className="mb-8 flex-1">
               <div className="flex items-baseline gap-1 mb-6">
                 <span className="text-4xl font-black text-slate-900">₹0</span>
-                <span className="text-slate-400 font-bold">/ 7 days</span>
+                <span className="text-slate-400 font-bold">/ 14 days</span>
               </div>
               <ul className="space-y-4">
                 {[
@@ -312,7 +313,7 @@ const Subscription = () => {
                 "Trial Unavailable"
               ) : (
                 <>
-                  Start 7-Day Trial{" "}
+                  Start 14-Day Trial{" "}
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </>
               )}
@@ -324,7 +325,7 @@ const Subscription = () => {
             )}
             {isTrialActive && (
               <p className="text-center mt-3 text-amber-600 text-sm font-bold">
-                Your 7-day free trial is currently active.
+                Your 14-day free trial is currently active.
               </p>
             )}
             {hasUsedTrial && !isTrialActive && (

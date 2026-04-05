@@ -1,6 +1,7 @@
 import React from "react";
 import { motion } from "motion/react";
 import { Mail, Phone, MapPin, Send } from "lucide-react";
+import { brandName } from "@/src/utils/constants";
 
 const ContactUs = () => {
   return (
@@ -33,7 +34,7 @@ const ContactUs = () => {
                 <h3 className="text-lg font-bold text-gray-900 mb-2">
                   Email Us
                 </h3>
-                <p className="text-gray-600 text-sm">support@scan2queue.com</p>
+                <p className="text-gray-600 text-sm">support@{brandName}.com</p>
                 <p className="text-gray-400 text-sm mt-1">
                   We respond within 24 hours.
                 </p>
@@ -63,9 +64,7 @@ const ContactUs = () => {
                 <h3 className="text-lg font-bold text-gray-900 mb-2">
                   Our Office
                 </h3>
-                <p className="text-gray-600 text-sm">
-                  Pune
-                </p>
+                <p className="text-gray-600 text-sm">Pune</p>
                 <p className="text-gray-600 text-sm">Maharashtra, IN 431601</p>
               </div>
             </div>
