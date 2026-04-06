@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { QRCodeSVG } from "qrcode.react";
 import { User } from "firebase/auth";
 import {
   collection,
@@ -20,19 +19,15 @@ import {
   CheckCircle2,
   Clock,
   Store,
-  Download,
   Calendar,
   FileDown,
   Trash2,
-  ChevronDown,
-  Filter,
   X,
   CreditCard,
   AlertTriangle,
   ArrowRight,
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
-import LiveClock from "../components/LiveClock";
 import { Restaurant, QueueEntry } from "../types";
 import QRDialog from "../components/QRDialog";
 
@@ -205,18 +200,6 @@ const RestaurantDashboard = ({
     (import.meta as any).env.VITE_APP_URL || window.location.origin;
   const cleanBaseUrl = baseUrl.endsWith("/") ? baseUrl.slice(0, -1) : baseUrl;
   const joinUrl = `${cleanBaseUrl}/join?restaurantId=${restaurantId}`;
-
-  const [copySuccess, setCopySuccess] = useState(false);
-
-  const copyToClipboard = async () => {
-    try {
-      await navigator.clipboard.writeText(joinUrl);
-      setCopySuccess(true);
-      setTimeout(() => setCopySuccess(false), 2000);
-    } catch (err) {
-      console.error("Failed to copy!", err);
-    }
-  };
 
   if (!restaurant) {
     return (
