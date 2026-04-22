@@ -8,8 +8,16 @@ import {
   serverTimestamp,
   runTransaction,
 } from "firebase/firestore";
-import { db } from "../firebase";
-import { Users, CheckCircle2, Clock, UserPlus, ArrowRight } from "lucide-react";
+import { db, messaging } from "../firebase";
+import { getToken } from "firebase/messaging";
+import {
+  Users,
+  CheckCircle2,
+  Clock,
+  UserPlus,
+  ArrowRight,
+  Bell,
+} from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { Restaurant, QueueEntry, OperationType } from "../types";
 import { handleFirestoreError } from "../services/errorHandling";
@@ -26,6 +34,52 @@ const CustomerJoin = () => {
   const [error, setError] = useState("");
   const [sessionTrigger, setSessionTrigger] = useState(0);
   const [isInitialCheckDone, setIsInitialCheckDone] = useState(false);
+  const [fcmToken, setFcmToken] = useState<string | null>(null);
+  const [showNotificationPrompt, setShowNotificationPrompt] = useState(false);
+
+  // Check if we already have permission
+  useEffect(() => {
+    if ("Notification" in window) {
+      if (Notification.permission === "default") {
+        setShowNotificationPrompt(true);
+      } else if (Notification.permission === "granted") {
+        requestNotificationToken();
+      }
+    }
+  }, []);
+
+  const requestNotificationToken = async () => {
+    if (!messaging) return;
+    try {
+      const currentToken = await getToken(messaging, {
+        vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY,
+      });
+      if (currentToken) {
+        setFcmToken(currentToken);
+        setShowNotificationPrompt(false);
+      } else {
+        console.warn(
+          "No registration token available. Request permission to generate one.",
+        );
+      }
+    } catch (err) {
+      console.error("An error occurred while retrieving token. ", err);
+    }
+  };
+
+  const handleAllowNotifications = async () => {
+    try {
+      const permission = await Notification.requestPermission();
+      if (permission === "granted") {
+        await requestNotificationToken();
+      } else {
+        setShowNotificationPrompt(false);
+      }
+    } catch (err) {
+      console.error("Error requesting notification permission:", err);
+      setShowNotificationPrompt(false);
+    }
+  };
 
   // Restore session from localStorage
   useEffect(() => {
@@ -135,6 +189,7 @@ const CustomerJoin = () => {
           members: members,
           tokenNumber: nextToken,
           status: "waiting",
+          fcmToken: fcmToken,
           createdAt: serverTimestamp(),
         });
 
@@ -373,6 +428,31 @@ const CustomerJoin = () => {
           <h2 className="text-2xl font-bold text-gray-900">Join the Queue</h2>
           <p className="text-gray-500 mt-2">{restaurant?.name}</p>
         </div>
+
+        {showNotificationPrompt && (
+          <div className="mb-6 p-4 bg-indigo-50 border border-indigo-100 rounded-2xl flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="bg-indigo-600 p-2 rounded-lg">
+                <Bell className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <p className="text-sm font-bold text-gray-900">
+                  Push Notifications
+                </p>
+                <p className="text-xs text-gray-500">
+                  Get notified when it's your turn
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={handleAllowNotifications}
+              type="button"
+              className="bg-indigo-600 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-indigo-700 transition-all shadow-sm"
+            >
+              Enable
+            </button>
+          </div>
+        )}
 
         {error && (
           <div className="mb-6 p-4 bg-red-50 border border-red-100 text-red-600 text-sm rounded-xl font-medium">

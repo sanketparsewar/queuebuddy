@@ -28,6 +28,7 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
+import toast from "react-hot-toast";
 import { Restaurant, QueueEntry } from "../types";
 import QRDialog from "../components/QRDialog";
 
@@ -121,9 +122,43 @@ const RestaurantDashboard = ({
 
   const updateStatus = async (id: string, status: "called" | "completed") => {
     if (!restaurantId) return;
-    await updateDoc(doc(db, "restaurants", restaurantId, "queue", id), {
-      status,
-    });
+    try {
+      const entryRef = doc(db, "restaurants", restaurantId, "queue", id);
+
+      // If status is "called", send push notification
+      if (status === "called") {
+        const entrySnap = await getDoc(entryRef);
+        if (entrySnap.exists()) {
+          const data = entrySnap.data();
+          if (data.fcmToken) {
+            try {
+              await fetch("/api/notifications/send", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  token: data.fcmToken,
+                  restaurantName: restaurant?.name,
+                  restaurantId: restaurantId,
+                }),
+              });
+            } catch (err) {
+              console.error("Failed to trigger push notification API:", err);
+            }
+          }
+        }
+      }
+
+      await updateDoc(entryRef, {
+        status,
+      });
+
+      if (status === "called") {
+        toast.success("Customer called!");
+      }
+    } catch (err) {
+      console.error("Error updating status:", err);
+      toast.error("Failed to update status.");
+    }
   };
 
   const deleteEntry = async (id: string) => {
@@ -200,6 +235,18 @@ const RestaurantDashboard = ({
     (import.meta as any).env.VITE_APP_URL || window.location.origin;
   const cleanBaseUrl = baseUrl.endsWith("/") ? baseUrl.slice(0, -1) : baseUrl;
   const joinUrl = `${cleanBaseUrl}/join?restaurantId=${restaurantId}`;
+
+  const [copySuccess, setCopySuccess] = useState(false);
+
+  const copyToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText(joinUrl);
+      setCopySuccess(true);
+      setTimeout(() => setCopySuccess(false), 2000);
+    } catch (err) {
+      console.error("Failed to copy!", err);
+    }
+  };
 
   if (!restaurant) {
     return (

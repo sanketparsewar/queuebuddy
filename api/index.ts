@@ -1,6 +1,37 @@
 import express from "express";
 import Razorpay from "razorpay";
 import crypto from "crypto";
+import dotenv from "dotenv";
+import * as adminNamespace from "firebase-admin";
+const admin = (adminNamespace as any).default || adminNamespace;
+
+dotenv.config();
+
+// Initialize Firebase Admin
+// Use a more robust check for admin apps
+const getAdminApp = () => {
+  if (admin.apps && admin.apps.length > 0) {
+    return admin.apps[0];
+  }
+
+  try {
+    return admin.initializeApp({
+      credential: admin.credential.applicationDefault(),
+      projectId:
+        process.env.VITE_FIREBASE_PROJECT_ID || "engaged-octane-465008-v5",
+    });
+  } catch (error) {
+    console.warn(
+      "Firebase Admin initialization with applicationDefault failed. Falling back to basic init.",
+    );
+    return admin.initializeApp({
+      projectId:
+        process.env.VITE_FIREBASE_PROJECT_ID || "engaged-octane-465008-v5",
+    });
+  }
+};
+
+getAdminApp();
 
 const app = express();
 
@@ -94,6 +125,40 @@ app.post("/api/razorpay/verify", async (req, res) => {
     console.error("Error verifying Razorpay payment:", error);
     res.status(500).json({
       error: "Failed to verify payment",
+      message: error.message,
+    });
+  }
+});
+
+// API Route to send FCM notification
+app.post("/api/notifications/send", async (req, res) => {
+  try {
+    const { token, title, body, restaurantName, restaurantId } = req.body;
+
+    if (!token) {
+      return res.status(400).json({ error: "No target token provided" });
+    }
+
+    const message: any = {
+      notification: {
+        title:
+          title || `It's your turn at ${restaurantName || "the restaurant"}!`,
+        body: body || "Please proceed to the counter.",
+      },
+      token: token,
+      webpush: {
+        fcmOptions: {
+          link: `${process.env.VITE_APP_URL}/join?restaurantId=${restaurantId}`,
+        },
+      },
+    };
+
+    const response = await admin.messaging().send(message);
+    res.json({ success: true, response });
+  } catch (error: any) {
+    console.error("Error sending FCM notification:", error);
+    res.status(500).json({
+      error: "Failed to send notification",
       message: error.message,
     });
   }
