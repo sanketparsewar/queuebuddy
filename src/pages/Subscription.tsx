@@ -78,14 +78,11 @@ const Subscription = () => {
   const handlePayment = async () => {
     if (!restaurantId || !restaurant) return;
 
-    const razorpayKey = import.meta.env.PROD
-      ? import.meta.env.VITE_RAZORPAY_KEY_ID_LIVE
-      : import.meta.env.VITE_RAZORPAY_KEY_ID_TEST;
+    const razorpayKey = import.meta.env.VITE_RAZORPAY_KEY_ID;
 
     if (!razorpayKey) {
-      const mode = import.meta.env.PROD ? "LIVE" : "TEST";
       alert(
-        `Razorpay ${mode} Key ID is missing. Please configure VITE_RAZORPAY_KEY_ID_${mode} in the settings.`,
+        "Razorpay Key ID is missing. Please configure VITE_RAZORPAY_KEY_ID in the settings.",
       );
       return;
     }
