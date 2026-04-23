@@ -1,16 +1,15 @@
 {
   "routes": [
     {
-      "src": "/api/razorpay/order",
-      "dest": "/api/razorpay.ts"
+      "source": "/api/razorpay/(order|verify)",
+      "destination": "/api/razorpay.ts"
     },
     {
-      "src": "/api/razorpay/verify",
-      "dest": "/api/razorpay.ts"
+      "handle": "filesystem"
     },
     {
-      "src": "/(.*)",
-      "dest": "/"
+      "source": "/(.*)",
+      "destination": "/"
     }
   ]
 }
