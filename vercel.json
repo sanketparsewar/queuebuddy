@@ -1,12 +1,16 @@
 {
-  "rewrites": [
+  "routes": [
     {
-      "source": "/api/(.*)",
-      "destination": "/api/index"
+      "src": "/api/razorpay/order",
+      "dest": "/api/razorpay.ts"
     },
     {
-      "source": "/(.*)",
-      "destination": "/"
+      "src": "/api/razorpay/verify",
+      "dest": "/api/razorpay.ts"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/"
     }
   ]
 }
