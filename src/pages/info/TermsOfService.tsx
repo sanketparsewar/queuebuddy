@@ -9,7 +9,11 @@ import {
   AlertTriangle,
   Mail,
 } from "lucide-react";
-import { BRANDNAME } from "@/src/utils/constants";
+import {
+  COMPANY_NAME,
+  COMPANY_NAME_TM,
+  PRODUCT_NAME,
+} from "@/src/utils/constants";
 
 const TermsOfService = () => {
   return (
@@ -35,7 +39,7 @@ const TermsOfService = () => {
 
           {/* LEGAL IDENTITY */}
           <p className="text-sm text-gray-400 mt-4 max-w-2xl mx-auto">
-            {BRANDNAME} is operated under the brand <strong>Daxabit®</strong>.
+            {PRODUCT_NAME} is a product by <strong>{COMPANY_NAME_TM}</strong>.
           </p>
         </motion.div>
 
@@ -48,8 +52,8 @@ const TermsOfService = () => {
               1. Acceptance of Terms
             </h2>
             <p className="text-gray-600 text-sm leading-relaxed">
-              By accessing or using {BRANDNAME}, you agree to be bound by these
-              Terms of Service. If you do not agree, you must not use the
+              By accessing or using {PRODUCT_NAME}, you agree to be bound by
+              these Terms of Service. If you do not agree, you must not use the
               service.
             </p>
           </section>
@@ -75,7 +79,7 @@ const TermsOfService = () => {
             </h2>
             <p className="text-gray-600 text-sm leading-relaxed">
               The service, including all content, features, and branding, is
-              owned by Sanket Parsewar under the brand Daxabit®. You may not
+              owned by Sanket Parsewar under {COMPANY_NAME_TM}. You may not
               copy, modify, distribute, or reproduce any part of the service
               without permission.
             </p>
@@ -133,7 +137,7 @@ const TermsOfService = () => {
               For any questions regarding these terms, contact:
             </p>
             <p className="text-gray-700 text-sm mt-3">
-              <strong>Daxabit</strong>
+              <strong>{COMPANY_NAME}</strong>
               <br />
               Email: {import.meta.env.VITE_SUPPORT_EMAIL}
             </p>

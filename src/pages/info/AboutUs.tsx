@@ -1,7 +1,7 @@
 import React from "react";
 import { motion } from "motion/react";
 import { Heart, Users, Zap, Clock } from "lucide-react";
-import { BRANDNAME } from "@/src/utils/constants";
+import { COMPANY_NAME_TM, PRODUCT_NAME } from "@/src/utils/constants";
 
 const AboutUs = () => {
   return (
@@ -14,7 +14,7 @@ const AboutUs = () => {
           className="text-center mb-16"
         >
           <h1 className="text-4xl sm:text-6xl font-black text-gray-900 mb-6">
-            About <span className="text-indigo-600">{BRANDNAME}</span>
+            About <span className="text-indigo-600">{PRODUCT_NAME}</span>
           </h1>
 
           <p className="text-xl text-gray-500 max-w-2xl mx-auto font-medium">
@@ -24,8 +24,7 @@ const AboutUs = () => {
 
           {/* TRUST LINE */}
           <p className="text-sm text-gray-400 mt-4 max-w-2xl mx-auto">
-            {BRANDNAME} is a product built and operated under the brand{" "}
-            <strong>Daxabit®</strong>.
+            {PRODUCT_NAME} is a product by <strong>{COMPANY_NAME_TM}</strong>.
           </p>
         </motion.div>
 
@@ -42,10 +41,10 @@ const AboutUs = () => {
             </h2>
 
             <p className="text-lg text-gray-600 leading-relaxed">
-              {BRANDNAME} was created to solve a simple but widespread problem —
-              long waiting times and inefficient queue management. Traditional
-              systems create frustration for customers and operational
-              challenges for businesses.
+              {PRODUCT_NAME} is developed to solve a simple but widespread
+              problem — long waiting times and inefficient queue management.
+              Traditional systems create frustration for customers and
+              operational challenges for businesses.
             </p>
 
             <p className="text-lg text-gray-600 leading-relaxed">
@@ -55,9 +54,9 @@ const AboutUs = () => {
             </p>
 
             <p className="text-lg text-gray-600 leading-relaxed">
-              Built under <strong>Daxabit®</strong>, we focus on creating
-              practical, scalable solutions that improve everyday business
-              operations.
+              Built under <strong>{COMPANY_NAME_TM}</strong>, we focus on
+              creating practical, scalable solutions that improve everyday
+              business operations.
             </p>
           </motion.div>
 

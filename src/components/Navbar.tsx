@@ -2,7 +2,7 @@ import React from "react";
 import { User } from "firebase/auth";
 import { Clock, LogOut } from "lucide-react";
 import { Link } from "react-router-dom";
-import { BRANDNAME } from "../utils/constants";
+import { PRODUCT_NAME } from "../utils/constants";
 
 const Navbar = ({
   user,
@@ -17,7 +17,7 @@ const Navbar = ({
         <Clock className="text-white w-5 h-5" />
       </div>
       <span className="font-bold text-xl tracking-tight text-gray-900">
-        {BRANDNAME}
+        {PRODUCT_NAME}
       </span>
     </Link>
     {user && (

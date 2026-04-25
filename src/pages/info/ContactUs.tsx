@@ -2,7 +2,6 @@ import React, { useRef } from "react";
 import { motion } from "motion/react";
 import { Mail, Phone, MapPin, Send } from "lucide-react";
 import emailjs from "@emailjs/browser";
-import { brandName } from "@/src/utils/constants";
 
 const ContactUs = () => {
   const formRef = useRef<HTMLFormElement | null>(null);

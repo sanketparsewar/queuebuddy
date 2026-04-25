@@ -9,7 +9,7 @@ import {
   Mail,
   CreditCard,
 } from "lucide-react";
-import { BRANDNAME } from "@/src/utils/constants";
+import { COMPANY_NAME, COMPANY_NAME_TM, PRODUCT_NAME } from "@/src/utils/constants";
 
 const PrivacyPolicy = () => {
   return (
@@ -35,8 +35,8 @@ const PrivacyPolicy = () => {
 
           {/*  LEGAL IDENTITY */}
           <p className="text-sm text-gray-400 mt-4 max-w-2xl mx-auto">
-            {BRANDNAME} is a product operated under the brand{" "}
-            <strong>Daxabit®</strong>.
+            {PRODUCT_NAME} is a product by{" "}
+            <strong>{COMPANY_NAME_TM}</strong>.
           </p>
         </motion.div>
 
@@ -114,10 +114,10 @@ const PrivacyPolicy = () => {
               5. Payments
             </h2>
             <p className="text-gray-600 text-sm leading-relaxed">
-              Payments for {BRANDNAME} services are processed through third-party
-              payment gateways such as Razorpay. Currently, payments are
-              processed under the name <strong>Sanket Parsewar</strong>{" "}
-              (individual owner of Daxabit®).
+              Payments for {PRODUCT_NAME} services are processed through
+              third-party payment gateways such as Razorpay. Currently, payments
+              are processed under the name <strong>Sanket Parsewar</strong>{" "}
+              (individual owner of {COMPANY_NAME_TM}).
             </p>
           </section>
 
@@ -143,7 +143,7 @@ const PrivacyPolicy = () => {
               If you have any questions, you can contact us at:
             </p>
             <p className="text-gray-700 text-sm mt-3">
-              <strong>Daxabit</strong>
+              <strong>{COMPANY_NAME}</strong>
               <br />
               Email: {import.meta.env.VITE_SUPPORT_EMAIL}
             </p>

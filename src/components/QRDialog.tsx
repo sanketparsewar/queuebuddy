@@ -2,7 +2,7 @@ import { QRCodeSVG } from "qrcode.react";
 import { motion, AnimatePresence } from "motion/react";
 import { Download, QrCode, CheckCircle2, X } from "lucide-react";
 import { useState } from "react";
-import { BRANDNAME } from "../utils/constants";
+import { PRODUCT_NAME } from "../utils/constants";
 
 type Props = {
   open: boolean;
@@ -47,7 +47,7 @@ const QRDialog = ({ open, onClose, joinUrl, restaurantName }: Props) => {
 
         // 3. Footer (Bottom)
         const footerY = 1050;
-        const footerText = BRANDNAME;
+        const footerText = PRODUCT_NAME;
         ctx.font = "bold 50px system-ui, -apple-system, sans-serif";
         const textWidth = ctx.measureText(footerText).width;
         const iconSize = 44;

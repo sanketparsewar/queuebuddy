@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import { motion } from "motion/react";
 import { Restaurant } from "../types";
-import { BRANDNAME } from "../utils/constants";
+import { PRODUCT_NAME } from "../utils/constants";
 
 const Subscription = () => {
   const { restaurantId } = useParams<{ restaurantId: string }>();
@@ -107,7 +107,7 @@ const Subscription = () => {
         key: razorpayKey,
         amount: order.amount,
         currency: order.currency,
-        name: BRANDNAME,
+        name: PRODUCT_NAME,
         description: `Subscription for ${restaurant.name}`,
         image: "/favicon.svg",
         order_id: order.id,
@@ -214,7 +214,7 @@ const Subscription = () => {
           </div>
           <div className="text-center">
             <h3 className="text-xl font-black text-slate-900 mb-1">
-              {BRANDNAME}
+              {PRODUCT_NAME}
             </h3>
             <p className="text-slate-500 font-medium animate-pulse">
               Loading subscription details...

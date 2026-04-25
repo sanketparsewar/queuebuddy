@@ -46,7 +46,7 @@ import ContactUs from "./pages/info/ContactUs";
 import PrivacyPolicy from "./pages/info/PrivacyPolicy";
 import TermsOfService from "./pages/info/TermsOfService";
 import { FaFacebook, FaInstagram, FaLinkedin } from "react-icons/fa";
-import { BRANDNAME } from "./utils/constants";
+import { COMPANY_NAME_TM, PRODUCT_NAME } from "./utils/constants";
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
@@ -134,7 +134,7 @@ const Home = ({
           </div>
           <div className="text-center">
             <h3 className="text-xl font-black text-slate-900 mb-1">
-              {BRANDNAME}
+              {PRODUCT_NAME}
             </h3>
             <p className="text-slate-500 font-medium animate-pulse">
               Preparing your workspace...
@@ -512,7 +512,7 @@ const Footer = () => {
                   <Clock className="text-white w-5 h-5" />
                 </div>
                 <span className="text-2xl font-black tracking-tighter text-gray-900">
-                  {BRANDNAME}
+                  {PRODUCT_NAME}
                 </span>
               </Link>
             </div>
@@ -597,8 +597,8 @@ const Footer = () => {
         </div>
         <div className="pt-8 border-t border-gray-200 flex flex-col sm:flex-row justify-between items-center gap-4">
           <p className="text-gray-400 font-medium text-sm">
-            © 2026 Daxabit Technologies LLP. All rights reserved. {BRANDNAME} is
-            a product built and operated by Daxabit®.
+            © 2026 {COMPANY_NAME_TM}. All rights reserved. {PRODUCT_NAME} is a
+            product by {COMPANY_NAME_TM}.
           </p>
           <motion.div
             animate={{ scale: [1, 1.1, 1] }}

@@ -2,7 +2,7 @@ import React from "react";
 import { motion } from "motion/react";
 import { CheckCircle2, Zap, Users, BarChart3 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { BRANDNAME } from "@/src/utils/constants";
+import { PRODUCT_NAME } from "@/src/utils/constants";
 
 const Pricing = () => {
   const plans = [
@@ -10,7 +10,7 @@ const Pricing = () => {
       name: "Free Trial",
       price: "0",
       duration: "14 Days",
-      description: `Experience the full power of ${BRANDNAME} with no commitment.`,
+      description: `Experience the full power of ${PRODUCT_NAME} with no commitment.`,
       features: [
         "Full Queue Management",
         "QR Code Generation",
